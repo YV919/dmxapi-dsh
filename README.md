@@ -1,44 +1,65 @@
-# DMXAPI-DSH配置工具
+<p align="center">
+  <a href="https://www.dmxapi.cn/"><img src="src/client/assets/dmxapi.png" width="200" alt="DMXAPI Logo" /></a>
+</p>
 
-插件包名：`dsh-dmxapi`；源码仓库：[YV919/dmxapi-dsh](https://github.com/YV919/dmxapi-dsh)。
+<h1 align="center">DMXAPI-DSH配置工具</h1>
 
-为 **DeepSeek Harness 官方 Web** 增加中文第三方 API 配置面板。参考 [DMXAPI 的 ZCode 配置方式](https://doc.dmxapi.cn/zcode.html)，分别配置 Chat Completions、OpenAI Responses 和 Anthropic Messages 服务商。三种预设已按顺序填好 12 个用户指定的模型 ID、图片能力、容量和思考参数；可直接填写 API Key，再按自己的 DMXAPI 账号核对并保存。原有 `DMXAPI / deepseek-v4.1-flash` 配置继续保留。
+<p align="center"><strong>DMXAPI 官方出品</strong> · 让 DeepSeek Harness 的第三方模型接入更简单</p>
 
-本插件补齐设置入口，使用 Harness 原有 `llm-pi-ai` 发送请求；模型仍在原生聊天模型选择器中选择。**当前适配并验证版本：dsh `0.1.5-rc.2`。** Harness 的开发分支已改变部分界面接口，其他版本需要重新验证。
+<p align="center">
+  <a href="https://github.com/YV919/dmxapi-dsh/releases/latest">下载插件</a> ·
+  <a href="#快速开始">快速开始</a> ·
+  <a href="QUICKSTART.md">详细安装指南</a> ·
+  <a href="https://www.dmxapi.cn/">DMXAPI 官网</a> ·
+  <a href="https://doc.dmxapi.cn/">官方文档</a>
+</p>
 
-## 安装
+<p align="center">
+  <a href="https://github.com/YV919/dmxapi-dsh/releases"><img src="https://img.shields.io/github/v/release/YV919/dmxapi-dsh?label=Release" alt="GitHub Release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/YV919/dmxapi-dsh" alt="MIT License" /></a>
+  <img src="https://img.shields.io/badge/DeepSeek%20Harness-0.1.5--rc.2-0f766e" alt="已验证的 DeepSeek Harness 版本：0.1.5-rc.2" />
+</p>
 
-需要 Node.js 22 或更新版本。Windows 用户从 [v0.1.8 GitHub Release](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.8) 下载 `dsh-dmxapi-0.1.8-windows.zip`，完整解压后运行：
+---
 
-```powershell
-.\install.ps1
-```
+在 DeepSeek Harness Web 的设置页，直接添加 DMXAPI 模型。无需手写服务商 YAML，也无需先设置 API Key 环境变量：选择接口预设、填写自己的密钥、确认模型参数，即可在原生聊天界面选用新模型。插件只**新增**服务商，已有配置与密钥保持原样。
 
-安装脚本把 ZIP 中的预构建包复制到 Harness profile 的 `local-packages` 中，再通过相对路径安装，兼容 Windows 中文与空格目录。设置了 `DSH_HOME` 时使用该目录，否则使用用户目录下的 `.dsh`。安装包副本会保留，供后续 pnpm 重装使用。其他平台可从同一 Release 下载 `.tgz`，按 [Harness 官方打包文档](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)安装到所需 profile。
+> **一个 Key，用全球大模型。** [DMXAPI](https://www.dmxapi.cn/) 提供统一的模型 API 服务。本工具由 DMXAPI 官方制作，预设 Chat、Responses、Anthropic 三类接入方式；可用模型、账号权限与计费以你的 DMXAPI 账号及[官方模型目录](https://doc.dmxapi.cn/omp.html)为准。
 
-关闭并重新启动当前 Harness 服务，然后刷新网页：
+## 为什么选择这个插件
 
-```powershell
-npx @deepseek-ai/dsh@0.1.5-rc.2 web
-```
+| 功能 | 你可以做什么 |
+| --- | --- |
+| 三种接口，各用其所长 | 分别新建 **DMXAPI · Chat**、**DMXAPI · Responses**、**DMXAPI · Anthropic**，将模型放进对应协议。 |
+| 12 个模型预设 | 按接口预填模型 ID、图片输入声明、上下文、输出上限和适用的思考选项；所有数值都可核对和调整。 |
+| 思考等级贴近原生 | Qwen 显示 `off / medium / xhigh`，MiMo 显示 **关闭 / 开启**；其他模型只显示各自预设的选项，避免无谓的等级映射。 |
+| 密钥直接填写 | API Key 输入默认隐藏，可切换显示；保存时交给 Harness 凭据服务，无需写入 YAML 或配置环境变量。 |
+| 原配置不受影响 | 只提供新增入口；同名预设自动使用新标识，不覆盖旧服务商及其密钥。 |
+| 自定义空间 | 可新建其他服务商，修改模型能力和参数，或导入、导出单服务商 YAML。 |
 
-从源码构建：
+## 快速开始
 
-```powershell
-npm ci
-npm run typecheck
-npm test
-npm run build
-npm run pack:plugin
-```
+**适用版本：DeepSeek Harness Web `0.1.5-rc.2`；需要 Node.js 22 或更新版本。** 其他 Harness 版本尚未完成适配验证。
 
-## 使用
+1. 下载 [Windows 安装包 `dsh-dmxapi-0.1.8-windows.zip`](https://github.com/YV919/dmxapi-dsh/releases/download/v0.1.8/dsh-dmxapi-0.1.8-windows.zip)，完整解压。在解压后的文件夹打开 PowerShell，运行：
 
-1. 进入 **设置 → 插件 → 插件配置**，找到 **DMXAPI-DSH配置工具** 配置卡。
-2. 在 **新增服务商** 中选择 **DMXAPI · Chat**、**DMXAPI · Responses**、**DMXAPI · Anthropic** 或 **新建自定义服务商**。前三项分别使用对应接口，预设模型已填好，无须逐个输入 ID。
-3. 在同一张卡的 **API Key** 输入框填写自己的密钥。输入默认隐藏，可点击 **显示** 查看本次输入。无需设置环境变量。
-4. 展开模型卡，检查 **图片输入**、思考选项和容量。每个模型只显示自己的选项，可添加或移除；MiMo 直接选择 **关闭 / 开启**，Qwen 直接选择 `off / medium / xhigh`。再点击 **新增配置**。
-5. 新建聊天，在 Harness 原生模型选择器中选择已配置的模型；可在思考等级菜单切换该模型声明的档位，图片由原生附件按钮上传。
+   ```powershell
+   .\install.ps1
+   ```
+
+2. 关闭已有 Harness 服务，重新启动并刷新网页：
+
+   ```powershell
+   npx --yes @deepseek-ai/dsh@0.1.5-rc.2 web
+   ```
+
+3. 打开 **设置 → 插件 → 插件配置 → DMXAPI-DSH配置工具**，选择一个预设，填写自己的 DMXAPI API Key，点击 **新增配置**。回到聊天界面，从原生模型选择器选择新模型。
+
+安装脚本默认安装到当前用户 `.dsh` 的 `web` profile；如设置了 `DSH_HOME`，会使用该目录。脚本保留预构建包，方便后续重装。其他平台可下载同一 Release 的 `.tgz`，按 [Harness 官方插件安装说明](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)安装。更多安装与使用步骤见 [QUICKSTART.md](QUICKSTART.md)。
+
+## 配置体验与密钥保护
+
+三种 DMXAPI 预设已填好各自的模型清单；也可选择 **新建自定义服务商**。展开模型卡可以检查图片输入、思考选项和容量，再点击 **新增配置**。模型仍由 Harness 原生聊天菜单选择，图片仍通过原生附件按钮上传。
 
 插件**只新增配置**，不显示同步状态，也不编辑或覆盖已有服务商。已有配置继续保留，可在 Harness 的 **设置 → 模型** 中管理。同名预设自动使用 `dmxapi-chat-2`、`dmxapi-chat-3` 等可用标识；手动填写已有标识时会拒绝新增。安装或升级插件不会自动迁移模型配置。
 
@@ -64,7 +85,7 @@ Anthropic SDK 自行追加 `/v1/messages`，使用根地址可避免出现 `/v1/
 
 ## 已预设模型
 
-下表按表单中的顺序列出模型。容量是厂商公布的模型规格，输入列表示插件预设的图片能力；**DMXAPI 对具体 ID 的路由、账号权限及参数支持仍需用自己的 Key 验证**，尤其是快照 ID 与 `-cc` 别名。模型卡可逐项修改。
+下表按表单中的顺序列出模型。容量是按上游公开资料整理的预设值，输入列表示插件预设的图片能力；**DMXAPI 对具体 ID 的路由、账号权限及参数支持仍需用自己的 Key 验证**，尤其是快照 ID 与 `-cc` 别名。模型卡可逐项修改。
 
 | 格式 | 模型 ID（从上到下） | 图片 | 上下文 / 最大输出 | 默认可选思考等级 |
 | --- | --- | --- | --- | --- |
@@ -120,6 +141,18 @@ Chat 预设使用 **跟随模型默认**：Qwen 默认 `medium`，其余已知�
 
 导入 YAML 一律作为新建草稿，同名时自动分配新标识。保存前会再次检查最新有效配置（包含 `cordis.yml` 继承来源），拒绝已存在的标识；提交只增加该新服务商路径。若其他页面或手工编辑先修改了设置，会拒绝旧版本提交并保留草稿，可先导出再重新载入。旧版预设仍兼容，但不再提供独立的新建入口。
 
+## 从源码构建
+
+```powershell
+npm ci
+npm run typecheck
+npm test
+npm run build
+npm run pack:plugin
+```
+
+构建完成后可从 `artifacts/` 取得 `.tgz`。普通用户请优先使用 [Release 安装包](https://github.com/YV919/dmxapi-dsh/releases/latest)。
+
 ## 卸载
 
 ```powershell
@@ -139,3 +172,7 @@ API Key 输入界面的验收使用隔离 profile 和虚构凭据，检查默认
 2026-09-18 在开发者本机另行完成真实 DMXAPI 验收：`deepseek-v4.1-flash` 成功识别测试图片；`off / low / high / max` 四档均返回成功，关闭档无思考内容，其他三档返回思考内容。官方 Web 已确认配置卡、图片附件入口和四档选择菜单可用。接口能力仍以接收者自己的账号及服务商后续更新为准；安装包不包含 API Key。
 
 依赖接口依据：[官方模型配置指南](https://deepseek-harness.github.io/deepseek-harness/en/guide/providers)、[官方插件设置卡说明](https://deepseek-harness.github.io/deepseek-harness/en/reference/cookbook/adding-a-settings-card)，以实际 `0.1.5-rc.2` 发布包为准。
+
+## 项目与支持
+
+插件以 [MIT 许可证](LICENSE)开源。配置问题或模型适配建议可在 [GitHub Issues](https://github.com/YV919/dmxapi-dsh/issues)反馈；开通账号、查询可用模型与价格，请访问 [DMXAPI 官网](https://www.dmxapi.cn/)及[官方文档](https://doc.dmxapi.cn/)。

@@ -61,7 +61,7 @@ Chat 使用 **跟随模型默认**：Qwen 默认 `medium`，其他已知预设�
 | DMXAPI · Responses | OpenAI Responses | `https://www.dmxapi.cn/v1` |
 | DMXAPI · Anthropic | Anthropic Messages | `https://www.dmxapi.cn` |
 
-一个模型只能放到它实际支持的接口下。DMXAPI 的 [ZCode 配置教程](https://doc.dmxapi.cn/zcode.html)也将三种格式建为独立供应商。若不知道模型格式，可查模型说明或 [DMXAPI 模型列表](https://doc.dmxapi.cn/omp.html)的 `supported_endpoint_types`。`-cc` 结尾的模型通常走 Anthropic 格式。
+一个模型只能放到它实际支持的接口下。若不知道模型格式，可查模型说明或 [DMXAPI 模型列表](https://doc.dmxapi.cn/omp.html)的 `supported_endpoint_types`。`-cc` 结尾的模型通常走 Anthropic 格式。
 
 预设会自动使用对应请求参数：Qwen 开启时发送 `enable_thinking: true` 与同名 `reasoning_effort: medium / xhigh`，关闭时发送 `enable_thinking: false`；MiMo 只发送思考开关，不发送 effort。DeepSeek、GLM、GPT-6 与 Claude 按各自协议发送参数。通常无需展开高级配置；Anthropic 仅显示与所选模型适用的传输方式，导入的自定义草稿也可编辑。
 
