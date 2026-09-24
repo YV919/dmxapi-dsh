@@ -1,0 +1,26 @@
+# 旧版单服务商 DeepSeek Chat 配置示例，供已有配置迁移或高级编辑使用。
+# 新用户建议在 Harness 插件配置卡分别选择 DMXAPI · Chat / Responses / Anthropic 预设。
+# 此文件不含 API Key；在插件卡的 API Key 输入框填写并由 Harness 凭据服务保存。
+# 本例的思考等级映射只代表 deepseek-v4.1-flash 的既有配置，不适用于任意 Chat 模型。
+llm-pi-ai:
+  providers:
+    dmxapi:
+      displayName: DMXAPI
+      apiKeyEnv: DMXAPI_API_KEY
+      api: openai-completions
+      baseURL: https://www.dmxapi.cn/v1
+      reasoning: high
+      compat:
+        thinkingFormat: deepseek
+        supportsReasoningEffort: true
+        supportsDeveloperRole: false
+        maxTokensField: max_tokens
+      models:
+        - id: deepseek-v4.1-flash
+          name: deepseek-v4.1-flash
+          input: [text, image]
+          reasoningEfforts:
+            "off": null
+            low: low
+            high: high
+            max: max

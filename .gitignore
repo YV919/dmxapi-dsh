@@ -1,0 +1,16 @@
+node_modules/
+.research/
+.test-home/
+.qa/
+lib/
+artifacts/
+*.log
+.env
+.env.*
+!.env.example
+settings.yaml
+.credentials.yaml
+.dsh/
+*-PLAN.md
+PLAN.md
+MODEL-PRESET-REPORT.html
