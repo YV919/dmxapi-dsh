@@ -1,6 +1,6 @@
 # DMXAPI-DSH配置工具安装说明（Windows）
 
-适用：DeepSeek Harness 官方 Web `0.1.5-rc.2`。需要先安装 Node.js 22 或更新版本，并能访问 npm 和 DMXAPI。
+适用：DeepSeek Harness Web `0.1.5-rc.2`。需要先安装 Node.js 22 或更新版本，并能访问 npm 和 DMXAPI。
 
 ## 安装
 
@@ -17,7 +17,7 @@
    npx --yes @deepseek-ai/dsh@0.1.5-rc.2 web
    ```
 
-安装过程需要联网下载官方 Harness 及依赖。默认安装到当前用户 `.dsh` 的 `web` profile；使用自定义 `DSH_HOME` 的用户，应在设置了相同变量的终端中运行安装和启动命令。
+安装过程需要联网下载 Harness 及依赖。默认安装到当前用户 `.dsh` 的 `web` profile；使用自定义 `DSH_HOME` 的用户，应在设置了相同变量的终端中运行安装和启动命令。
 
 若系统提示脚本未签名或禁止执行，请按你所在设备的 PowerShell 脚本策略处理，或使用下面的手动安装方式，无需修改系统执行策略：
 
@@ -65,7 +65,7 @@ Chat 使用 **跟随模型默认**：Qwen 默认 `medium`，其他已知预设�
 
 预设会自动使用对应请求参数：Qwen 开启时发送 `enable_thinking: true` 与同名 `reasoning_effort: medium / xhigh`，关闭时发送 `enable_thinking: false`；MiMo 只发送思考开关，不发送 effort。DeepSeek、GLM、GPT-6 与 Claude 按各自协议发送参数。通常无需展开高级配置；Anthropic 仅显示与所选模型适用的传输方式，导入的自定义草稿也可编辑。
 
-**思考选项以每个模型实际支持的内容为准。** 可以添加或移除选项；多个模型没有共同默认等级时，服务商选择 **跟随模型默认**。配置保存及本地模拟测试通过，不等于 DMXAPI 所有模型已完成线上验收；请求字段与官方依据见 README。
+**思考选项以每个模型实际支持的内容为准。** 可以添加或移除选项；多个模型没有共同默认等级时，服务商选择 **跟随模型默认**。配置保存及本地模拟测试通过，不等于 DMXAPI 所有模型已完成线上验收；请求字段与资料依据见 README。
 
 新草稿切换协议时，会提示移除当前协议不兼容的 `compat` 参数；DMXAPI 的两种 OpenAI 协议使用 `/v1` 地址，Anthropic 使用域名根地址。其他自定义地址不会被自动修改。
 

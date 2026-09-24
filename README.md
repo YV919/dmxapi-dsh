@@ -4,14 +4,14 @@
 
 <h1 align="center">DMXAPI-DSH配置工具</h1>
 
-<p align="center"><strong>DMXAPI 官方出品</strong> · 让 DeepSeek Harness 的第三方模型接入更简单</p>
+<p align="center"><strong>DMXAPI 模型快速配置工具</strong> · 适用于 DeepSeek Harness</p>
 
 <p align="center">
   <a href="https://github.com/YV919/dmxapi-dsh/releases/latest">下载插件</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="QUICKSTART.md">详细安装指南</a> ·
   <a href="https://www.dmxapi.cn/">DMXAPI 官网</a> ·
-  <a href="https://doc.dmxapi.cn/">官方文档</a>
+  <a href="https://doc.dmxapi.cn/">DMXAPI 文档</a>
 </p>
 
 <p align="center">
@@ -24,7 +24,7 @@
 
 在 DeepSeek Harness Web 的设置页，直接添加 DMXAPI 模型。无需手写服务商 YAML，也无需先设置 API Key 环境变量：选择接口预设、填写自己的密钥、确认模型参数，即可在原生聊天界面选用新模型。插件只**新增**服务商，已有配置与密钥保持原样。
 
-> **一个 Key，用全球大模型。** [DMXAPI](https://www.dmxapi.cn/) 提供统一的模型 API 服务。本工具由 DMXAPI 官方制作，预设 Chat、Responses、Anthropic 三类接入方式；可用模型、账号权限与计费以你的 DMXAPI 账号及[官方模型目录](https://doc.dmxapi.cn/omp.html)为准。
+> **一个 Key，使用所有大模型。** [DMXAPI](https://www.dmxapi.cn/) 提供统一的模型 API 服务。本插件预设 Chat、Responses、Anthropic 三类接入方式；可用模型、账号权限与计费以你的 DMXAPI 账号及[DMXAPI 模型目录](https://doc.dmxapi.cn/omp.html)为准。
 
 ## 为什么选择这个插件
 
@@ -55,7 +55,7 @@
 
 3. 打开 **设置 → 插件 → 插件配置 → DMXAPI-DSH配置工具**，选择一个预设，填写自己的 DMXAPI API Key，点击 **新增配置**。回到聊天界面，从原生模型选择器选择新模型。
 
-安装脚本默认安装到当前用户 `.dsh` 的 `web` profile；如设置了 `DSH_HOME`，会使用该目录。脚本保留预构建包，方便后续重装。其他平台可下载同一 Release 的 `.tgz`，按 [Harness 官方插件安装说明](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)安装。更多安装与使用步骤见 [QUICKSTART.md](QUICKSTART.md)。
+安装脚本默认安装到当前用户 `.dsh` 的 `web` profile；如设置了 `DSH_HOME`，会使用该目录。脚本保留预构建包，方便后续重装。其他平台可下载同一 Release 的 `.tgz`，按 [Harness 插件安装说明](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)安装。更多安装与使用步骤见 [QUICKSTART.md](QUICKSTART.md)。
 
 ## 配置体验与密钥保护
 
@@ -102,7 +102,7 @@ Anthropic SDK 自行追加 `/v1/messages`，使用根地址可避免出现 `/v1/
 | Anthropic | `claude-opus-5-5-cc` | 是 | 1M / 128K | `low / high / max` |
 | Anthropic | `claude-sonnet-5-cc` | 是 | 1M / 128K | `off / low / high / max` |
 
-规格与原生参数分别依据 [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing/)、[GLM-5.3](https://docs.z.ai/guides/llm/glm-5.3)、[GLM-5.3-Flash](https://docs.z.ai/guides/vlm/glm-5.3-flash)、[Qwen3.8](https://help.aliyun.com/en/model-studio/qwen3-8-max)、[MiMo](https://mimo.mi.com/models/zh-CN/mimo-v2.6-pro)、[OpenAI GPT-6 Astra](https://developers.openai.com/api/docs/models/gpt-6-astra)、[Sol](https://developers.openai.com/api/docs/models/gpt-6-sol)、[Luna](https://developers.openai.com/api/docs/models/gpt-6-luna) 与 [Claude Fable](https://platform.claude.com/docs/en/models/fable-5-1/overview)、[Opus](https://platform.claude.com/docs/en/models/opus-5-5/overview)、[Sonnet](https://platform.claude.com/docs/en/models/sonnet-5/overview) 的官方资料；[Qwen 的 Chat 参数](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions)、[MiMo 的 Chat 参数](https://mimo.mi.com/docs/en-US/api/chat/openai-api) 和 [Claude effort 参数](https://platform.claude.com/docs/en/build-with-claude/effort) 另见相应接口文档。三款 Claude 的 `-cc` 是用户要求保留的 **DMXAPI 路由 ID**；不能把它去掉后发送，也不应将其当作 Anthropic 官方模型 ID。DMXAPI 公开文档尚未逐一证实全部 12 个 ID 已对所有账号开放。
+规格与原生参数分别依据 [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing/)、[GLM-5.3](https://docs.z.ai/guides/llm/glm-5.3)、[GLM-5.3-Flash](https://docs.z.ai/guides/vlm/glm-5.3-flash)、[Qwen3.8](https://help.aliyun.com/en/model-studio/qwen3-8-max)、[MiMo](https://mimo.mi.com/models/zh-CN/mimo-v2.6-pro)、[OpenAI GPT-6 Astra](https://developers.openai.com/api/docs/models/gpt-6-astra)、[Sol](https://developers.openai.com/api/docs/models/gpt-6-sol)、[Luna](https://developers.openai.com/api/docs/models/gpt-6-luna) 与 [Claude Fable](https://platform.claude.com/docs/en/models/fable-5-1/overview)、[Opus](https://platform.claude.com/docs/en/models/opus-5-5/overview)、[Sonnet](https://platform.claude.com/docs/en/models/sonnet-5/overview) 的公开资料；[Qwen 的 Chat 参数](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions)、[MiMo 的 Chat 参数](https://mimo.mi.com/docs/en-US/api/chat/openai-api) 和 [Claude effort 参数](https://platform.claude.com/docs/en/build-with-claude/effort) 另见相应接口文档。三款 Claude 的 `-cc` 是用户要求保留的 **DMXAPI 路由 ID**；不能把它去掉后发送，也不应将其当作 Anthropic 原生模型 ID。DMXAPI 公开文档尚未逐一证实全部 12 个 ID 已对所有账号开放。
 
 ## 思考等级与多模态
 
@@ -169,10 +169,10 @@ npx @deepseek-ai/dsh@0.1.5-rc.2 plugin --profile web remove dsh-dmxapi
 
 API Key 输入界面的验收使用隔离 profile 和虚构凭据，检查默认隐藏、显示切换、保存与导出隔离；这一流程不需要真实 Key，也不调用付费模型。验收结果以对应版本的测试记录为准。
 
-2026-09-18 在开发者本机另行完成真实 DMXAPI 验收：`deepseek-v4.1-flash` 成功识别测试图片；`off / low / high / max` 四档均返回成功，关闭档无思考内容，其他三档返回思考内容。官方 Web 已确认配置卡、图片附件入口和四档选择菜单可用。接口能力仍以接收者自己的账号及服务商后续更新为准；安装包不包含 API Key。
+2026-09-18 在开发者本机另行完成真实 DMXAPI 验收：`deepseek-v4.1-flash` 成功识别测试图片；`off / low / high / max` 四档均返回成功，关闭档无思考内容，其他三档返回思考内容。在 DeepSeek Harness Web 中已确认配置卡、图片附件入口和四档选择菜单可用。接口能力仍以接收者自己的账号及服务商后续更新为准；安装包不包含 API Key。
 
-依赖接口依据：[官方模型配置指南](https://deepseek-harness.github.io/deepseek-harness/en/guide/providers)、[官方插件设置卡说明](https://deepseek-harness.github.io/deepseek-harness/en/reference/cookbook/adding-a-settings-card)，以实际 `0.1.5-rc.2` 发布包为准。
+依赖接口依据：[Harness 模型配置指南](https://deepseek-harness.github.io/deepseek-harness/en/guide/providers)、[Harness 插件设置卡说明](https://deepseek-harness.github.io/deepseek-harness/en/reference/cookbook/adding-a-settings-card)，以实际 `0.1.5-rc.2` 发布包为准。
 
 ## 项目与支持
 
-插件以 [MIT 许可证](LICENSE)开源。配置问题或模型适配建议可在 [GitHub Issues](https://github.com/YV919/dmxapi-dsh/issues)反馈；开通账号、查询可用模型与价格，请访问 [DMXAPI 官网](https://www.dmxapi.cn/)及[官方文档](https://doc.dmxapi.cn/)。
+插件以 [MIT 许可证](LICENSE)开源。配置问题或模型适配建议可在 [GitHub Issues](https://github.com/YV919/dmxapi-dsh/issues)反馈；开通账号、查询可用模型与价格，请访问 [DMXAPI 官网](https://www.dmxapi.cn/)及[DMXAPI 文档](https://doc.dmxapi.cn/)。
