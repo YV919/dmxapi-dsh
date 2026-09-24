@@ -29,6 +29,7 @@
 .dmx-fields:disabled { opacity: .65; }
 .dmx-toolbar { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 18px; }
 .dmx-provider-picker { flex: 1; min-width: 0; }
+.dmx-existing-picker { margin: -4px 0 14px; }
 .dmx-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .dmx-card button { font: inherit; font-size: 12px; line-height: 20px; color: var(--dmx-text); background: var(--dmx-surface); border: 1px solid var(--dmx-border); border-radius: 7px; padding: 7px 11px; cursor: pointer; white-space: nowrap; transition: background .12s ease, border-color .12s ease; }
 .dmx-card button:hover:not(:disabled) { background: var(--dmx-soft); border-color: var(--dmx-muted); }

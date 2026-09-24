@@ -2,7 +2,8 @@ import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
 import { dump, JSON_SCHEMA } from 'js-yaml';
 import dmxapiIcon from './assets/dmxapi.png';
 import type { SaveConfigurationResult } from './save-configuration.ts';
-import { createNewProviderDraft, makeProviderDraftUnique, type NewProviderKind } from '../new-provider.ts';
+import { createNewProviderDraft, existingPresetProviderIds, makeProviderDraftUnique, selectProviderDraft, type NewProviderKind } from '../new-provider.ts';
+import { assertExistingModelEdit, redactHiddenYamlFields, restoreHiddenYamlFields } from '../model-edit.ts';
 import {
   REASONING_MODES, applyReasoningMode, deepseekAnthropicBridgeModels,
   inferReasoningMode, normalizeProtocolDraft, visibleReasoningModes,
@@ -26,6 +27,7 @@ import {
 export interface Snapshot {
   status: 'loading' | 'ready' | 'unavailable';
   value?: { providers?: Record<string, ProviderProfile> };
+  base?: unknown;
   revision?: number;
   writable: boolean;
   mode: 'host' | 'memory';
@@ -37,6 +39,7 @@ export interface DmxapiCardProps {
     subscribe: (listener: () => void) => () => void;
   };
   save: (draft: ProviderDraft, revision: number, apiKey: string) => Promise<SaveConfigurationResult>;
+  updateModels: (draft: ProviderDraft, revision: number) => Promise<{ revision: number }>;
   retryCredential: (receipt: SaveConfigurationResult, apiKey: string) => Promise<SaveConfigurationResult>;
 }
 
@@ -53,36 +56,7 @@ function containsHeaders(value: unknown): boolean {
 // Editing must work even while required fields are incomplete. Downloads use
 // the stricter exporter, while this serializer only formats a local draft.
 function editorYaml(draft: ProviderDraft): string {
-  const redact = (value: unknown): unknown => {
-    if (Array.isArray(value)) return value.map(redact);
-    if (!isRecord(value)) return value;
-    return Object.fromEntries(Object.entries(value)
-      .filter(([key]) => !['headers', 'apikey', 'token', 'password', 'passwd', 'secret',
-        'clientsecret', 'accesstoken', 'refreshtoken', 'authorization', 'credential', 'credentials']
-        .includes(key.toLowerCase().replace(/[-_\s]/g, '')))
-      .map(([key, entry]) => [key, redact(entry)]));
-  };
-  return dump({ [draft.id]: redact(draft.profile) }, { schema: JSON_SCHEMA, noRefs: true, lineWidth: -1 });
-}
-
-// The YAML editor intentionally omits request headers. Restore them only to the
-// same provider/model, so editing visible fields does not erase hidden settings.
-function restoreHeaders(edited: unknown, original: unknown): unknown {
-  if (Array.isArray(edited) && Array.isArray(original)) {
-    return edited.map((entry, index) => {
-      const previous = isRecord(entry) && typeof entry.id === 'string'
-        ? original.find(item => isRecord(item) && item.id === entry.id)
-        : original[index];
-      return restoreHeaders(entry, previous);
-    });
-  }
-  if (!isRecord(edited) || !isRecord(original)) return edited;
-  const result = { ...edited };
-  for (const [key, value] of Object.entries(original)) {
-    if (key.toLowerCase() === 'headers' && !(key in result)) result[key] = copy(value);
-    else if (key in result) result[key] = restoreHeaders(result[key], value);
-  }
-  return result;
+  return dump({ [draft.id]: redactHiddenYamlFields(draft.profile) }, { schema: JSON_SCHEMA, noRefs: true, lineWidth: -1 });
 }
 
 function destinations(value: unknown, path = '', result: Record<string, unknown> = {}): Record<string, unknown> {
@@ -160,7 +134,7 @@ function isSimpleSwitch(value: ModelProfile['reasoningEfforts']): boolean {
     value.off === 'disabled' && value.high === 'high';
 }
 
-export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
+export function DmxapiCard({ store, save, updateModels, retryCredential }: DmxapiCardProps) {
   const snapshot = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const uid = useId();
   const [draft, setDraft] = useState<ProviderDraft>(() => createDmxapiProtocolDraft('chat'));
@@ -168,6 +142,7 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
   const [showKey, setShowKey] = useState(false);
   const [pendingCredential, setPendingCredential] = useState<SaveConfigurationResult | null>(null);
   const [selection, setSelection] = useState<NewProviderKind>('chat');
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [revision, setRevision] = useState<number | undefined>();
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -181,6 +156,10 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
   const initialDraft = useRef<ProviderDraft>(draft);
   const fileInput = useRef<HTMLInputElement>(null);
   const providers = snapshot.value?.providers ?? {};
+  const baseProviders = isRecord(snapshot.base) && isRecord(snapshot.base.providers) ? snapshot.base.providers : {};
+  const baseProvider = editingId ? baseProviders[editingId] : undefined;
+  const inheritedReasoning = isRecord(baseProvider) ? baseProvider.reasoning : undefined;
+  const existingIds = selection === 'custom' ? [] : existingPresetProviderIds(selection, providers);
   const locked = saving || snapshot.status !== 'ready' || !snapshot.writable || snapshot.mode !== 'host';
   const conflict = !pendingCredential && dirty && revision !== undefined && snapshot.revision !== revision;
   let importedCredentialRef: string | undefined;
@@ -192,7 +171,8 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
   } catch { /* Incomplete YAML is validated on save. */ }
   const deepseekWireModels = protocolPreview ? deepseekAnthropicBridgeModels(protocolPreview.draft) : [];
 
-  function load(next: ProviderDraft, nextSelection: NewProviderKind, changed = false, loadedRevision = store.getSnapshot().revision) {
+  function load(next: ProviderDraft, nextSelection: NewProviderKind, changed = false,
+    loadedRevision = store.getSnapshot().revision, existingId: string | null = null) {
     const value = copy(next);
     setDraft(value);
     setApiKey('');
@@ -200,6 +180,7 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
     initialDraft.current = copy(value);
     setPendingCredential(null);
     setSelection(nextSelection);
+    setEditingId(existingId);
     setRevision(loadedRevision);
     setEfforts((value.profile.models ?? []).map(model =>
       model.reasoningEfforts === undefined ? '' : formatEfforts(model.reasoningEfforts)));
@@ -217,13 +198,21 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
     if (snapshot.status !== 'ready') return;
     if (!initialized.current) {
       initialized.current = true;
-      load(createNewProviderDraft('chat', providers), 'chat');
+      const selected = selectProviderDraft('chat', providers);
+      load(selected.draft, 'chat', false, snapshot.revision, selected.existingId);
       return;
     }
     if (!dirty && !saving && !pendingCredential && snapshot.revision !== revision) {
-      load(makeProviderDraftUnique(draft, providers), selection);
+      if (editingId && providers[editingId]) {
+        load({ id: editingId, profile: providers[editingId] }, selection, false, snapshot.revision, editingId);
+      } else if (editingId && selection !== 'custom') {
+        const selected = selectProviderDraft(selection, providers);
+        load(selected.draft, selection, false, snapshot.revision, selected.existingId);
+      } else {
+        load(makeProviderDraftUnique(draft, providers), selection, false, snapshot.revision);
+      }
     }
-  }, [snapshot, dirty, saving, revision, pendingCredential]);
+  }, [snapshot, dirty, saving, revision, pendingCredential, editingId]);
 
   function markDirty() {
     setDirty(true);
@@ -333,13 +322,23 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
     const result = parseProviderYaml(yaml);
     checkHeaderDestination(result, draft);
     if (result.id === draft.id) {
-      result.profile = restoreHeaders(result.profile, draft.profile) as ProviderProfile;
+      result.profile = restoreHiddenYamlFields(result.profile, draft.profile) as ProviderProfile;
     }
     return result;
   }
 
   function valueToSave() {
     const authored = mode === 'yaml' ? yamlValue() : formValue();
+    if (editingId) {
+      assertExistingModelEdit(initialDraft.current, authored, mode === 'yaml');
+      const overrides = initialDraft.current.profile.modelOverrides;
+      if (overrides && typeof overrides === 'object' && Object.keys(overrides).length > 0) {
+        throw new Error('此服务商使用 modelOverrides，不能同时保存 models。请在 Harness 的“设置 → 模型”中处理覆盖项。');
+      }
+      validateDraft(authored);
+      checkHeaderDestination(authored, initialDraft.current);
+      return authored;
+    }
     validateDraft(authored);
     const value = normalizeProtocolDraft(authored).draft;
     checkHeaderDestination(value, initialDraft.current);
@@ -372,19 +371,32 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
 
   function selectProvider(value: NewProviderKind) {
     if (!mayDiscard()) return;
-    load(createNewProviderDraft(value, store.getSnapshot().value?.providers ?? {}), value);
+    const selected = selectProviderDraft(value, store.getSnapshot().value?.providers ?? {});
+    load(selected.draft, value, false, store.getSnapshot().revision, selected.existingId);
+  }
+
+  function selectExistingProvider(id: string) {
+    if (!mayDiscard()) return;
+    const selected = selectProviderDraft(selection, store.getSnapshot().value?.providers ?? {}, id);
+    load(selected.draft, selection, false, store.getSnapshot().revision, selected.existingId);
   }
 
   function resetDraft() {
     if (!mayDiscard()) return;
-    load(makeProviderDraftUnique(initialDraft.current, store.getSnapshot().value?.providers ?? {}), selection);
+    const current = store.getSnapshot();
+    const currentProviders = current.value?.providers ?? {};
+    if (editingId && currentProviders[editingId]) {
+      load({ id: editingId, profile: currentProviders[editingId] }, selection, false, current.revision, editingId);
+    } else if (editingId && selection !== 'custom') {
+      const selected = selectProviderDraft(selection, currentProviders);
+      load(selected.draft, selection, false, current.revision, selected.existingId);
+    } else load(makeProviderDraftUnique(initialDraft.current, currentProviders), selection, false, current.revision);
   }
 
   function finishCreation(result: SaveConfigurationResult) {
     const current = store.getSnapshot();
-    const occupied = { ...(current.value?.providers ?? {}), [result.draft.id]: result.draft.profile };
-    load(createNewProviderDraft(selection, occupied), selection, false, current.revision ?? result.revision);
-    setNotice(`已新增“${result.draft.profile.displayName || result.draft.id}”（${result.draft.id}）。原有配置未修改，可在聊天中选择新模型。`);
+    load(result.draft, selection, false, current.revision ?? result.revision, result.draft.id);
+    setNotice(`已新增“${result.draft.profile.displayName || result.draft.id}”（${result.draft.id}）。后续添加或修改模型会直接保存到此服务商。`);
   }
 
   function continueCreating() {
@@ -410,14 +422,25 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
     setError('');
     setNotice('');
     try {
-      if (locked || pendingCredential) throw new Error('当前不能新增配置，请先处理待保存的密钥或等待连接恢复。');
+      if (locked || pendingCredential) throw new Error('当前不能保存配置，请先处理待保存的密钥或等待连接恢复。');
       const current = store.getSnapshot();
       if (revision === undefined || current.revision !== revision) {
         throw new Error('配置已在其他位置更新。请先导出草稿，重新载入后再编辑。');
       }
       const next = valueToSave();
+      if (editingId) {
+        if (next.id !== editingId || !Object.hasOwn(current.value?.providers ?? {}, editingId)) {
+          throw new Error('所选服务商已变化，请重新载入配置。');
+        }
+        setSaving(true);
+        const result = await updateModels(next, revision);
+        const savedProfile = store.getSnapshot().value?.providers?.[editingId] ?? next.profile;
+        load({ id: editingId, profile: savedProfile }, selection, false, result.revision, editingId);
+        setNotice(`已更新“${next.profile.displayName || editingId}”的模型配置。服务商标识、地址和 API Key 保持不变。`);
+        return;
+      }
       if (Object.hasOwn(current.value?.providers ?? {}, next.id)) {
-        throw new Error(`服务商标识“${next.id}”已存在。插件只新增配置，请使用其他标识，原配置不会被覆盖。`);
+        throw new Error(`服务商标识“${next.id}”已存在。请选择该预设下的已有服务商来修改模型，或使用其他标识新建独立配置。`);
       }
       setSaving(true);
       const result = await save(next, revision, apiKey);
@@ -479,7 +502,7 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
         <img className="dmx-brand" src={dmxapiIcon} alt="DMXAPI" />
         <div className="dmx-heading">
           <h2 id={`${uid}-title`}>DMXAPI-DSH配置工具</h2>
-          <p>新增第三方 API、图片输入和模型思考等级。</p>
+          <p>快速配置第三方 API、图片输入和模型思考等级。</p>
         </div>
       </header>
 
@@ -491,7 +514,7 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
         <fieldset className="dmx-fields" disabled={locked || !!pendingCredential}>
           <div className="dmx-toolbar">
             <label className="dmx-field dmx-provider-picker">
-                <span>新增服务商</span>
+                <span>服务商配置</span>
                 <select value={selection} onChange={event => selectProvider(event.target.value as NewProviderKind)}>
                   <option value="chat">DMXAPI · Chat</option>
                   <option value="responses">DMXAPI · Responses</option>
@@ -507,14 +530,27 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
             </div>
           </div>
 
-          <p className="dmx-note">这里只新增配置，不修改已有服务商。原配置继续保留，可在 Harness 的“设置 → 模型”中管理。</p>
+          {existingIds.length > 0 && <label className="dmx-field dmx-existing-picker">
+            <span>当前服务商 <small>选择已有配置，或明确新建独立配置</small></span>
+            <select value={editingId ?? ''} onChange={event => selectExistingProvider(event.target.value)}>
+              {existingIds.map(id => <option key={id} value={id}>{providers[id]?.displayName || id} · {id}</option>)}
+              <option value="">＋ 新建独立配置</option>
+            </select>
+          </label>}
+          <p className="dmx-note">{editingId
+            ? `正在编辑 ${editingId}：新增或修改模型会保存到此服务商，现有 API 地址和密钥保持不变。`
+            : '当前是新建独立配置；保存后可以继续在同一服务商中添加或修改模型。'}</p>
+          {!!editingId && !!initialDraft.current.profile.modelOverrides &&
+            typeof initialDraft.current.profile.modelOverrides === 'object' &&
+            Object.keys(initialDraft.current.profile.modelOverrides).length > 0 &&
+            <div className="dmx-alert" role="alert">此服务商使用 modelOverrides；请先在 Harness 的“设置 → 模型”中处理覆盖项，再用此工具编辑模型列表。</div>}
 
           <div className="dmx-mode" role="group" aria-label="编辑方式">
             <button type="button" aria-pressed={mode === 'form'} onClick={() => switchMode('form')}>表单配置</button>
             <button type="button" aria-pressed={mode === 'yaml'} onClick={() => switchMode('yaml')}>完整 YAML</button>
           </div>
 
-          <div className="dmx-field dmx-secret-field">
+          {!editingId && <div className="dmx-field dmx-secret-field">
             <label htmlFor={`${uid}-api-key`}>API Key <small>为新服务商独立保存</small></label>
             <div className="dmx-secret-input">
               <input id={`${uid}-api-key`} className="dmx-code" type={showKey ? 'text' : 'password'}
@@ -526,9 +562,9 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
                 onClick={() => setShowKey(value => !value)}>{showKey ? '隐藏' : '显示'}</button>
             </div>
             <p id={`${uid}-key-hint`} className="dmx-hint">默认隐藏，保存后清空。填写密钥不会替换其他服务商的密钥。{importedCredentialRef && '此草稿包含凭据引用：留空使用导入引用，填写则为新服务商独立保存。'}</p>
-          </div>
+          </div>}
 
-          {dirty && protocolPreview && (protocolPreview.removedCompat.length > 0 || protocolPreview.baseURLChanged) &&
+          {!editingId && dirty && protocolPreview && (protocolPreview.removedCompat.length > 0 || protocolPreview.baseURLChanged) &&
             <div className="dmx-note" role="status">
               {protocolPreview.removedCompat.length > 0 && `保存时将移除 ${protocolPreview.removedCompat.length} 项当前协议不支持的兼容参数。`}
               {protocolPreview.baseURLChanged && `DMXAPI 请求地址将调整为 ${protocolPreview.draft.profile.baseURL}。`}
@@ -543,13 +579,13 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
               <textarea className="dmx-code dmx-yaml" value={yaml} spellCheck={false} rows={22}
                 onChange={event => { setYaml(event.target.value); markDirty(); }} />
             </label>
-            <p className="dmx-hint">在此编辑 compat、模型兼容项及其他高级字段。请求头不会显示或导出；同标识、同地址的已有请求头会保留。不要填写 API 密钥。</p>
+            <p className="dmx-hint">{editingId ? '已有服务商只能修改 models 和默认思考等级；请求头等敏感字段不会显示或导出，修改带隐藏字段的模型 ID 请使用表单。' : '在此编辑 compat、模型兼容项及其他高级字段。请求头不会显示或导出；同标识、同地址的已有请求头会保留。'}不要填写 API 密钥。</p>
           </div> : <>
             <div className="dmx-grid">
-              <label className="dmx-field"><span>显示名称</span><input value={draft.profile.displayName ?? ''} placeholder="DMXAPI" onChange={event => updateProfile('displayName', event.target.value || undefined)} /></label>
-              <label className="dmx-field"><span>服务商标识 <small>必须与已有配置不同</small></span><input className="dmx-code" value={draft.id} placeholder="my-provider" onChange={event => { setDraft({ ...draft, id: event.target.value }); markDirty(); }} /></label>
-              <label className="dmx-field dmx-span"><span>API 地址</span><input className="dmx-code" type="url" value={draft.profile.baseURL ?? ''} placeholder="https://www.dmxapi.cn/v1" onChange={event => updateProfile('baseURL', event.target.value)} /></label>
-              <label className="dmx-field"><span>接口协议</span><select value={draft.profile.api ?? 'openai-completions'} onChange={event => {
+              <label className="dmx-field"><span>显示名称</span><input value={draft.profile.displayName ?? ''} readOnly={!!editingId} placeholder="DMXAPI" onChange={event => updateProfile('displayName', event.target.value || undefined)} /></label>
+              <label className="dmx-field"><span>服务商标识 <small>{editingId ? '现有配置，不可更改' : '必须与已有配置不同'}</small></span><input className="dmx-code" value={draft.id} readOnly={!!editingId} placeholder="my-provider" onChange={event => { setDraft({ ...draft, id: event.target.value }); markDirty(); }} /></label>
+              <label className="dmx-field dmx-span"><span>API 地址</span><input className="dmx-code" type="url" value={draft.profile.baseURL ?? ''} readOnly={!!editingId} placeholder="https://www.dmxapi.cn/v1" onChange={event => updateProfile('baseURL', event.target.value)} /></label>
+              <label className="dmx-field"><span>接口协议</span><select value={draft.profile.api ?? 'openai-completions'} disabled={!!editingId} onChange={event => {
                 setModeSelections(models.map(model => inferReasoningMode(model, draft.profile.api, draft.id)));
                 updateProfile('api', event.target.value);
               }}>
@@ -557,7 +593,7 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
                 {draft.profile.api && !['openai-completions', 'openai-responses', 'anthropic-messages'].includes(draft.profile.api) && <option value={draft.profile.api}>{draft.profile.api}（现有协议）</option>}
               </select></label>
               <label className="dmx-field"><span>默认思考等级</span><select value={draft.profile.reasoning ?? ''} onChange={event => updateProfile('reasoning', event.target.value || undefined)}>
-                <option value="">跟随模型默认</option>
+                <option value="" disabled={editingId !== null && inheritedReasoning !== undefined}>跟随模型默认</option>
                 {commonDefaultLevels.map(level => <option key={level} value={level}>
                   {switchOnly ? level === 'off' ? '关闭' : '开启' : level === 'off' ? 'off · 关闭思考' : level}
                 </option>)}
@@ -566,6 +602,7 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
             </div>
             <p className="dmx-hint dmx-advanced-hint">{protocolPathHint(draft.profile.api)}</p>
             <p className="dmx-hint dmx-advanced-hint">这里只列出所有模型共同支持的等级。选择「跟随模型默认」时，DMXAPI 预设的千问默认 medium，其他思考模型默认高强度；开关模型默认开启。</p>
+            {editingId && inheritedReasoning !== undefined && <p className="dmx-hint dmx-advanced-hint">此服务商从 Harness 继承默认思考等级；清空用户层会恢复继承值，不能在此选择「跟随模型默认」。</p>}
 
             <div className="dmx-section-title"><div><h3>模型</h3><span>{models.length} 个模型 · 点击一行编辑</span></div><div className="dmx-actions">
               <button type="button" onClick={() => {
@@ -647,18 +684,20 @@ export function DmxapiCard({ store, save, retryCredential }: DmxapiCardProps) {
                 }}>删除此模型</button></div>
               </div>
             </details>;})}</div>
-            <p className="dmx-hint dmx-advanced-hint">新模型会根据 ID 推荐传输方式；请确认 DMXAPI 对该模型支持所选档位。thinkingFormat、maxTokensField 等参数可在「完整 YAML」中编辑。</p>
+            <p className="dmx-hint dmx-advanced-hint">新模型会根据 ID 推荐传输方式；请确认 DMXAPI 对该模型支持所选档位。模型级 thinkingFormat、maxTokensField 等参数可在「完整 YAML」中编辑。</p>
           </>}
         </fieldset>
 
-        <div className="dmx-key-note"><span className="dmx-note-icon" aria-hidden="true">i</span><p>API Key 由 Harness 凭据服务保存，不会写入模型配置或 YAML 导出。直接在上方填写并保存即可。</p></div>
+        <div className="dmx-key-note"><span className="dmx-note-icon" aria-hidden="true">i</span><p>{editingId
+          ? '修改模型时不会读取或改写已有 API Key；如需调整密钥，请使用 Harness 的“设置 → 模型”。'
+          : 'API Key 由 Harness 凭据服务保存，不会写入模型配置或 YAML 导出。直接在上方填写并保存即可。'}</p></div>
 
         {conflict && <div className="dmx-conflict" role="alert"><div><strong>检测到其他位置的配置更新</strong><p>你的草稿仍然保留。可先导出 YAML，再重新载入最新配置。</p></div><button type="button" onClick={resetDraft} disabled={saving}>重新载入</button></div>}
         {error && <div className="dmx-alert" role="alert">{error}</div>}
         {notice && <div className="dmx-success" role="status">{notice}</div>}
-        <footer className="dmx-footer"><span>{pendingCredential ? '配置已新增，等待密钥保存' : '仅新增，不覆盖已有配置'}</span><div className="dmx-actions">
+        <footer className="dmx-footer"><span>{pendingCredential ? '配置已新增，等待密钥保存' : editingId ? `直接更新 ${editingId} 的模型` : '新建独立配置，不覆盖已有服务商'}</span><div className="dmx-actions">
           {pendingCredential ? <><button type="button" onClick={continueCreating} disabled={saving}>继续新建</button><button type="button" className="dmx-primary" onClick={() => void retryKey()} disabled={locked}>{saving ? '正在重试…' : '重试密钥'}</button></>
-            : <><button type="button" onClick={resetDraft} disabled={locked || !dirty}>取消修改</button><button type="submit" className="dmx-primary" disabled={locked || conflict}>{saving ? '正在新增…' : '新增配置'}</button></>}
+            : <><button type="button" onClick={resetDraft} disabled={locked || !dirty}>取消修改</button><button type="submit" className="dmx-primary" disabled={locked || conflict}>{saving ? '正在保存…' : editingId ? '保存模型修改' : '新增配置'}</button></>}
         </div></footer>
       </form>
     </section>

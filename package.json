@@ -1,7 +1,7 @@
 {
   "name": "dsh-dmxapi",
-  "version": "0.1.8",
-  "description": "DMXAPI-DSH配置工具：为 DeepSeek Harness Web 新增 DMXAPI 和自定义服务商配置。",
+  "version": "0.1.9",
+  "description": "DMXAPI-DSH配置工具：在 DeepSeek Harness Web 新增服务商，并直接编辑已有服务商的模型。",
   "type": "module",
   "license": "MIT",
   "repository": {

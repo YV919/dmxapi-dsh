@@ -25,16 +25,16 @@
 $dmxHome = if ($env:DSH_HOME) { $env:DSH_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.dsh' }
 $dmxStore = Join-Path $dmxHome 'profiles\web\local-packages'
 New-Item -ItemType Directory -Path $dmxStore -Force | Out-Null
-Copy-Item -LiteralPath '.\artifacts\dsh-dmxapi-0.1.8.tgz' -Destination $dmxStore -Force
-npx.cmd --yes @deepseek-ai/dsh@0.1.5-rc.2 plugin --profile web add file:local-packages/dsh-dmxapi-0.1.8.tgz
+Copy-Item -LiteralPath '.\artifacts\dsh-dmxapi-0.1.9.tgz' -Destination $dmxStore -Force
+npx.cmd --yes @deepseek-ai/dsh@0.1.5-rc.2 plugin --profile web add file:local-packages/dsh-dmxapi-0.1.9.tgz
 ```
 
-## 填写自己的密钥
+## 配置服务商与模型
 
 1. 打开 **设置 → 插件 → 插件配置 → DMXAPI-DSH配置工具**。
-2. 在 **新增服务商** 中选择 **DMXAPI · Chat**、**DMXAPI · Responses**、**DMXAPI · Anthropic** 或 **新建自定义服务商**。前三项的模型已按下面的顺序填好，每份配置只对应一种协议。
-3. 展开需要调整的模型卡，核对图片输入、思考选项和容量。卡片只显示该模型已有的选项，可按需求添加或移除；传输方式与 YAML 在折叠的高级配置中。
-4. 在同一张配置卡的 **API Key** 输入框填写自己的密钥，点击 **新增配置**。输入默认隐藏，点击 **显示** 可查看正在填写的内容，也可随时切回 **隐藏**；无需设置环境变量。
+2. 选择 **DMXAPI · Chat**、**DMXAPI · Responses**、**DMXAPI · Anthropic** 或 **新建自定义服务商**。前三项每份配置只对应一种协议；若同 ID、同协议的预设服务商已存在，插件优先打开它。存在历史副本时，可选择要编辑的路由；只有明确选择 **新建独立配置** 才会另外创建一份服务商。
+3. 展开需要调整的模型卡，新增或修改模型，并核对图片输入、思考选项和容量。卡片只显示该模型已有的选项，可按需求添加或移除；传输方式与 YAML 在折叠的高级配置中。
+4. 首次新建服务商时，在 **API Key** 输入框填写自己的密钥并点击 **新增配置**。输入默认隐藏，点击 **显示** 可查看正在填写的内容，也可切回 **隐藏**；无需设置环境变量。编辑已有服务商时直接点击 **保存模型修改**，无需重新填写密钥；这一步只更新模型列表和在表单中调整的默认思考等级，不改动原 API Key、地址或协议。
 5. 新建会话，从 Harness 原生模型菜单选择刚保存的模型及其支持的思考等级；点击附件按钮添加图片。
 
 | 格式 | 预设模型 ID（从上到下） |
@@ -49,9 +49,9 @@ Chat 使用 **跟随模型默认**：Qwen 默认 `medium`，其他已知预设�
 
 升级不会迁移旧模型配置。如果已新建或手工采用 Qwen 原生等级配置，而会话仍保存 `high` 或 `max`，请展开 **思考等级** 菜单重选 `medium` 或 `xhigh`；只重新选择同一个模型不会清除旧等级。
 
-这里**只新增，不同步或覆盖旧配置**。选择同名预设或导入同名 YAML，会自动使用 `dmxapi-chat-2` 等新标识；手动填写已存在的标识会被拒绝。旧配置和旧密钥继续保留，可在 Harness 的 **设置 → 模型** 中管理。
+已有同 ID、同协议的预设路由会在原位置保存模型改动，不会自动复制出 `dmxapi-chat-2`。只有显式选择 **新建独立配置** 或导入同名 YAML，才会使用下一个可用标识；手动填写已存在的标识作为新服务商时会被拒绝。**新建自定义服务商**和 YAML 导入仍是独立新增。其他配置和原密钥继续保留，可在 Harness 的 **设置 → 模型** 中管理；安装或升级不会自动迁移已有配置。
 
-填写密钥会创建独立凭据引用，不替换旧密钥；留空只保留草稿自己导入的引用。保存成功后输入框清空并恢复隐藏，切换预设或取消修改也会清空当前输入。若配置已新增但密钥失败，可点击 **重试密钥**，不会重复写模型配置。不要把密钥填写到“完整 YAML”中。
+新建服务商时填写密钥会创建独立凭据引用，不替换旧密钥；留空只保留草稿自己导入的引用。编辑已有服务商不会读取或重写它的密钥。新建保存成功后输入框清空并恢复隐藏，切换预设或取消修改也会清空当前输入。若新建配置已保存但密钥失败，可点击 **重试密钥**，不会重复写模型配置。不要把密钥填写到“完整 YAML”中。
 
 ## 选择正确的接口和思考方式
 
