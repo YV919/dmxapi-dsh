@@ -17,12 +17,12 @@
 <p align="center">
   <a href="https://github.com/YV919/dmxapi-dsh/releases"><img src="https://img.shields.io/github/v/release/YV919/dmxapi-dsh?label=Release" alt="GitHub Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/YV919/dmxapi-dsh" alt="MIT License" /></a>
-  <img src="https://img.shields.io/badge/DeepSeek%20Harness-0.1.5--rc.2-0f766e" alt="已验证的 DeepSeek Harness 版本：0.1.5-rc.2" />
+  <img src="https://img.shields.io/badge/DeepSeek%20Harness-0.2.0--rc.2-0f766e" alt="支持 DeepSeek Harness Desktop / Web 0.2.0-rc.2" />
 </p>
 
 ---
 
-在 DeepSeek Harness Web 的设置页，直接配置 DMXAPI 模型。无需手写服务商 YAML，也无需先设置 API Key 环境变量：首次添加服务商时选择接口预设并填写自己的密钥；之后可在同一服务商中增改模型，无需重复创建服务商。模型仍在原生聊天界面选用。
+在 DeepSeek Harness 桌面端和 Web 工作台中，直接配置 DMXAPI 模型。打开左侧 **插件 → DMXAPI-DSH配置工具**，选择接口预设并填写自己的密钥即可开始；之后可在同一服务商中增改模型，无需重复创建服务商。无需手写服务商 YAML 或设置 API Key 环境变量，模型仍在原生聊天界面选用。
 
 > **一个 Key，使用所有大模型。** [DMXAPI](https://www.dmxapi.cn/) 提供统一的模型 API 服务。本插件预设 Chat、Responses、Anthropic 三类接入方式；可用模型、账号权限与计费以你的 DMXAPI 账号及[DMXAPI 模型目录](https://doc.dmxapi.cn/omp.html)为准。
 
@@ -39,23 +39,20 @@
 
 ## 快速开始
 
-**适用版本：DeepSeek Harness Web `0.1.5-rc.2`；需要 Node.js 22 或更新版本。** 其他 Harness 版本尚未完成适配验证。
+**插件 `0.2.0` 适用于 DeepSeek Harness Desktop / Web `0.2.0-rc.2`。** 使用旧 Harness Web `0.1.5-rc.2` 的用户请保留插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
 
-1. 下载 [Windows 安装包 `dsh-dmxapi-0.1.9-windows.zip`](https://github.com/YV919/dmxapi-dsh/releases/download/v0.1.9/dsh-dmxapi-0.1.9-windows.zip)，完整解压。在解压后的文件夹打开 PowerShell，运行：
+1. 在 Harness 工作台左侧打开 **插件 → 添加插件**，粘贴下面的预构建安装包地址：
 
-   ```powershell
-   .\install.ps1
+   ```text
+   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0.tgz
    ```
 
-2. 关闭已有 Harness 服务，重新启动并刷新网页：
+2. 点击 **安装**，完成后选择 **立即启用**。如果 Harness 提示需要重启，请按提示重启。
+3. 打开 **插件 → DMXAPI-DSH配置工具**，选择接口预设。首次创建服务商时填写自己的 DMXAPI API Key 并点击 **新增配置**；已有同 ID、同协议服务商时，直接增改模型并点击 **保存模型修改**。回到聊天，从原生模型菜单选择模型。
 
-   ```powershell
-   npx --yes @deepseek-ai/dsh@0.1.5-rc.2 web
-   ```
+Windows 用户也可下载 [v0.2.0 安装 ZIP](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0-windows.zip)，完整解压，先启动过桌面端并从系统托盘完全退出，再运行 `./install.ps1`。脚本默认安装到 `desktop` profile，只使用已安装桌面端自带的运行时，不需要另外安装 Node.js，也不会修改 PATH。找不到安装目录时可指定 `-DesktopPath "C:\你的安装目录\DeepSeek Harness"`。Web 用户明确运行 `./install.ps1 -Profile web`，需要 Node.js `^22.19.0` 或 `>=24.0.0`。详细步骤和升级方式见 [QUICKSTART.md](QUICKSTART.md)。
 
-3. 打开 **设置 → 插件 → 插件配置 → DMXAPI-DSH配置工具**，选择接口预设。首次创建服务商时填写自己的 DMXAPI API Key 并点击 **新增配置**；已有同 ID、同协议服务商时，直接增改模型并点击 **保存模型修改**。回到聊天界面，从原生模型选择器选择模型。
-
-安装脚本默认安装到当前用户 `.dsh` 的 `web` profile；如设置了 `DSH_HOME`，会使用该目录。脚本保留预构建包，方便后续重装。其他平台可下载同一 Release 的 `.tgz`，按 [Harness 插件安装说明](https://deepseek-harness.github.io/deepseek-harness/develop/basic/publish)安装。更多安装与使用步骤见 [QUICKSTART.md](QUICKSTART.md)。
+GitHub Release 提供公开安装包；社区插件市场的收录状态以[投稿 PR](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pulls?q=dmxapi-dsh)和市场目录为准。
 
 ## 配置体验与密钥保护
 
@@ -155,23 +152,27 @@ npm run pack:plugin
 
 ## 卸载
 
+在工作台左侧 **插件** 中打开本插件，使用 Harness 提供的卸载操作；需要重启时按界面提示操作。Web 命令行用户也可执行：
+
 ```powershell
-npx @deepseek-ai/dsh@0.1.5-rc.2 plugin --profile web remove dsh-dmxapi
+npx --yes @deepseek-ai/dsh@0.2.0-rc.2 plugin --profile web remove dsh-dmxapi
 ```
 
-重启 Harness。已保存的模型配置与凭据仍由 Harness 管理，可在原生模型页手工删除。卸载也会移除插件提供的默认思考等级、MiMo 显示标签和 DeepSeek Anthropic 专用适配；继续使用模型前，请在聊天中显式选择该模型支持的原生等级，尤其不要让 GLM 等始终思考模型回退为关闭状态。MiMo 将恢复显示 Harness 内部的 `off / high`；使用 DeepSeek Anthropic 专用适配的配置需先切换到其他受支持的协议。
+已保存的模型配置与凭据仍由 Harness 管理，可在原生模型页手工删除。卸载也会移除插件提供的默认思考等级、MiMo 显示标签和 DeepSeek Anthropic 专用适配；继续使用模型前，请在聊天中显式选择该模型支持的原生等级，尤其不要让 GLM 等始终思考模型回退为关闭状态。MiMo 将恢复显示 Harness 内部的 `off / high`；使用 DeepSeek Anthropic 专用适配的配置需先切换到其他受支持的协议。
 
 ## 验证范围
 
 自动化测试使用本地模拟 HTTP/SSE 服务以及真实发布版 Harness runtime，验证配置到实际请求参数的链路，不会向 DMXAPI 发送付费请求。
 
-`0.1.9` 的回归目标包括已有同协议服务商的模型增改不产生新服务商、历史副本与显式新建的选择、原有密钥与地址保持不变，以及三协议独立预设、Qwen 原生 `medium / xhigh` 请求、MiMo 开关且无 effort 参数、模型默认等级与菜单显示、图片与新建密钥流程；具体通过情况以该版本测试记录为准。本地模拟测试不代表 DMXAPI 的全部模型或其他供应商模型均已通过真实接口验收。
+`0.2.0` 已分别通过 Harness `0.2.0-rc.2` 与 `0.2.1-alpha.1` SDK / runtime 的 116 项自动化测试，覆盖新版工作台插件入口、桌面安装边界、三种协议、思考参数、图片与凭据隔离，以及已有服务商的模型增改、保存并发和重启持久化。本地模拟测试不代表 DMXAPI 的全部模型或其他供应商模型均已通过真实接口验收。
+
+2026-10-08 在 Windows 的 Harness Desktop `0.2.0-rc.2` 完成实际安装与界面验收：插件列表正确显示名称、图标和版本，配置页正常打开，插件已启用；安装前后核对的 4 个原有模型配置与凭据文件内容一致。`0.2.1-alpha.1` 的验证范围为隔离环境中的 SDK / runtime 测试，未宣称完成该预览版桌面界面验收。
 
 API Key 输入界面的验收使用隔离 profile 和虚构凭据，检查默认隐藏、显示切换、保存与导出隔离；这一流程不需要真实 Key，也不调用付费模型。验收结果以对应版本的测试记录为准。
 
 2026-09-18 在开发者本机另行完成真实 DMXAPI 验收：`deepseek-v4.1-flash` 成功识别测试图片；`off / low / high / max` 四档均返回成功，关闭档无思考内容，其他三档返回思考内容。在 DeepSeek Harness Web 中已确认配置卡、图片附件入口和四档选择菜单可用。接口能力仍以接收者自己的账号及服务商后续更新为准；安装包不包含 API Key。
 
-依赖接口依据：[Harness 模型配置指南](https://deepseek-harness.github.io/deepseek-harness/en/guide/providers)、[Harness 插件设置卡说明](https://deepseek-harness.github.io/deepseek-harness/en/reference/cookbook/adding-a-settings-card)，以实际 `0.1.5-rc.2` 发布包为准。
+依赖接口依据：[Harness 工作台插件管理](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.0-rc.2/packages/client/ui-plugin-manager/README.zh.md)、[桌面运行时与插件安装](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.0-rc.2/apps/desktop/README.zh.md)，以实际 `0.2.0-rc.2` 发布包为准。
 
 ## 项目与支持
 

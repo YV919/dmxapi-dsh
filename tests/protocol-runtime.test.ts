@@ -1,13 +1,11 @@
 import assert from 'node:assert/strict';
 import { after, before, test, type TestContext } from 'node:test';
 import { createServer, type IncomingHttpHeaders } from 'node:http';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join, resolve, sep } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { Context } from '@deepseek-ai/cordis';
 import LlmRuntime, { BlockAssembler, createUserMessage, ReasoningEffortId } from '@deepseek-ai/dsh-llm';
 import * as LlmPiAi from '@deepseek-ai/dsh-llm-pi-ai';
-import { FileSettingsProvider } from '@deepseek-ai/dsh-settings-file';
+import { settingsFixture } from './settings-fixture.ts';
 import { createDmxapiDraft, createDmxapiProtocolDraft, type ProviderDraft } from '../src/config.ts';
 import { normalizeProtocolDraft } from '../src/protocol.ts';
 import * as DmxapiPlugin from '../src/index.ts';
@@ -97,19 +95,7 @@ async function mockProtocol(api: Protocol) {
 }
 
 async function settingsRuntime(t: TestContext) {
-  const tempRoot = resolve(tmpdir());
-  const directory = await mkdtemp(join(tempRoot, 'dsh-dmxapi-protocol-'));
-  const ctx = new Context();
-  t.after(async () => {
-    await ctx.fiber.dispose();
-    const target = resolve(directory);
-    assert.ok(target.startsWith(tempRoot + sep), 'Only the allocated test directory may be removed');
-    await rm(target, { recursive: true, force: true });
-  });
-  await ctx.plugin(LlmRuntime);
-  const settingsPath = join(directory, 'settings.yaml');
-  await ctx.plugin(FileSettingsProvider, { path: settingsPath, watch: false });
-  await ctx.plugin(LlmPiAi, {});
+  const { ctx, settingsPath } = await settingsFixture(t);
   await ctx.plugin(FixtureAttachments);
   const save = (draft: ProviderDraft) => ctx.settings.mutate('llm-pi-ai', [{ op: 'set', path: ['providers', draft.id], value: draft.profile }],
     ctx.settings.describe().find(section => section.ns === 'llm-pi-ai')!.revision);
@@ -117,7 +103,7 @@ async function settingsRuntime(t: TestContext) {
 }
 
 function imageMessages() {
-  return [createUserMessage({ source: { kind: 'plugin', plugin: 'dsh-dmxapi-test' }, content: [
+  return [createUserMessage({ source: { kind: 'user' }, content: [
     { type: 'text', text: '请描述图片' }, { type: 'image', attachment: IMAGE_REF },
   ] })];
 }

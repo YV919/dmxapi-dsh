@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "DMXAPI-DSH配置工具",
+    "description": "在 DeepSeek Harness 工作台配置 DMXAPI 和自定义服务商，支持 Chat、Responses、Anthropic，并直接编辑已有服务商的模型。"
+  }
+}

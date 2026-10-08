@@ -1,13 +1,11 @@
 import assert from 'node:assert/strict';
 import { after, before, test } from 'node:test';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join, resolve, sep } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { Context } from '@deepseek-ai/cordis';
 import LlmRuntime, { createUserMessage, ReasoningEffortId } from '@deepseek-ai/dsh-llm';
 import * as LlmPiAi from '@deepseek-ai/dsh-llm-pi-ai';
 import type { PiAiProviderProfile } from '@deepseek-ai/dsh-llm-pi-ai';
-import { FileSettingsProvider } from '@deepseek-ai/dsh-settings-file';
+import { settingsFixture } from './settings-fixture.ts';
 import { assemble, bootRuntime, FixtureAttachments, IMAGE_REF, MODEL, mockOpenAI, PNG_BASE64, TEST_KEY, TEST_KEY_ENV, testProfile } from './helpers.ts';
 import { createDmxapiProtocolDraft } from '../src/config.ts';
 import { applyReasoningMode } from '../src/protocol.ts';
@@ -173,7 +171,7 @@ test('图片通过原生 adapter 发送 image_url/base64，并保留 system 和�
   await ctx.plugin(FixtureAttachments);
   const result = await assemble(ctx, {
     system: '请描述图片', maxTokens: 77,
-    messages: [createUserMessage({ source: { kind: 'plugin', plugin: 'dsh-dmxapi-test' }, content: [
+    messages: [createUserMessage({ source: { kind: 'user' }, content: [
       { type: 'text', text: '这是什么？' }, { type: 'image', attachment: IMAGE_REF },
     ] })],
   });
@@ -219,21 +217,9 @@ test('未声明的思考档位在发送请求前被拒绝', async t => {
 });
 
 test('真实文件设置热添加 provider，保留其他配置，并拒绝过期 revision 和无效模型', async t => {
-  const tempRoot = resolve(tmpdir());
-  const directory = await mkdtemp(join(tempRoot, 'dsh-dmxapi-runtime-'));
-  t.after(async () => {
-    const target = resolve(directory);
-    assert.ok(target.startsWith(tempRoot + sep), 'Only the allocated temporary test directory may be removed');
-    await rm(target, { recursive: true, force: true });
-  });
   const server = await mockOpenAI();
   t.after(server.close);
-  const ctx = new Context();
-  t.after(() => ctx.fiber.dispose());
-  await ctx.plugin(LlmRuntime);
-  const settingsPath = join(directory, 'settings.yaml');
-  await ctx.plugin(FileSettingsProvider, { path: settingsPath, watch: false });
-  await ctx.plugin(LlmPiAi, {});
+  const { ctx, settingsPath } = await settingsFixture(t);
   assert.deepEqual(ctx.llm.listProviders(), []);
   const revision = () => ctx.settings.describe().find(section => section.ns === 'llm-pi-ai')!.revision;
   await ctx.settings.mutate('llm-pi-ai', [{ op: 'set', path: ['providers', 'other-provider'], value: {

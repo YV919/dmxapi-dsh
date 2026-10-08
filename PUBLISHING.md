@@ -1,70 +1,12 @@
-# 面向公众分享与发布
+# 发布与市场投稿
 
-源码仓库：[YV919/dmxapi-dsh](https://github.com/YV919/dmxapi-dsh)。当前发布路线是 GitHub 源码和 Release 预构建安装包；**尚未发布到 npm**。本文中的 npm 安装命令只有在维护者另外完成 npm 发布后才能使用。
+源码仓库：[YV919/dmxapi-dsh](https://github.com/YV919/dmxapi-dsh)。插件 `0.2.0` 面向 DeepSeek Harness Desktop / Web `0.2.0-rc.2`，通过 GitHub Release 提供预构建包，尚未发布 npm。旧 Harness Web `0.1.5-rc.2` 使用插件 `0.1.9`。
 
-当前明确适配并验证的版本是 **DeepSeek Harness 官方 Web `0.1.5-rc.2`**。不要把说明改成“支持全部版本”，也不要在未验证前将示例命令替换为最新版。每位使用者都需要自己的 DMXAPI API Key。
+GitHub Release 发布、市场投稿和市场收录是三个阶段。只有目录维护者合并投稿、市场完成同步后，才能称“已在市场上架”。当前状态以[投稿 PR](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pulls?q=dmxapi-dsh)和[社区目录](https://awesome-dsh-plugin.com/)为准。
 
-## 立即分享给其他人
+## 1. 构建并验证
 
-可以先把预构建安装包、安装脚本和说明放进 ZIP。解压后的目录必须保留以下结构：
-
-```text
-dsh-dmxapi/
-├── install.ps1
-├── QUICKSTART.md
-├── README.md
-├── PUBLISHING.md
-├── LICENSE
-├── examples/
-│   └── dmxapi.yaml
-└── artifacts/
-    └── dsh-dmxapi-0.1.9.tgz
-```
-
-`install.ps1` 按自身目录寻找 `artifacts/dsh-dmxapi-0.1.9.tgz`，因此不要把 tgz 单独移到脚本旁，也不要让接收者直接在 ZIP 预览窗口内执行脚本。
-
-接收者需要先安装 Node.js 22 或更高版本，并准备自己的 DMXAPI API Key。在解压目录打开 PowerShell，执行：
-
-```powershell
-.\install.ps1
-```
-
-安装依赖需要联网；该 ZIP 是便携分发包，不是完整离线版 Harness。若设备禁止执行 PowerShell 脚本，`QUICKSTART.md` 提供了不修改执行策略的手动安装命令。
-
-安装后关闭原来的 Harness 服务，再启动已验证的版本：
-
-```powershell
-npx --yes @deepseek-ai/dsh@0.1.5-rc.2 web
-```
-
-在“设置 → 插件 → 插件配置”的“DMXAPI-DSH配置工具”卡中，入口只有 **DMXAPI · Chat**、**DMXAPI · Responses**、**DMXAPI · Anthropic** 和 **新建自定义服务商**。选择前三项时，优先打开同 ID、同协议的已有路由；若存在历史副本，可选择具体路由。增改模型后点击 **保存模型修改**，只更新模型列表及表单中调整的默认思考等级，不重建服务商，也不改原 API Key、地址或协议。只有明确选择 **新建独立配置**，或新建自定义服务商、导入 YAML，才作为新服务商保存；同名新草稿自动分配可用标识，手工重名会拒绝保存。首次新建时，接收者填写自己的 API Key 后点击 **新增配置**；新密钥使用独立随机引用，不覆盖旧密钥，无需设置环境变量。输入默认隐藏，保存成功后清空，已保存的明文不会读回。留空只保留草稿显式导入的引用。安装或升级不会自动迁移旧配置。每模型的思考选项、图片输入和高级配置见 README。不要把自己的 Key 或整个 `.dsh` 目录分享给别人。
-
-预设清单按顺序为：Chat 的 `deepseek-v4.1-flash`、`glm-5.3`、`glm-5.3-flash`、`qwen3.8-max`、`qwen3.8-max-0902`、`mimo-v2.6-pro`；Responses 的 `gpt-6-astra`、`gpt-6-sol`、`gpt-6-luna`；Anthropic 的 `claude-fable-5-1-cc`、`claude-opus-5-5-cc`、`claude-sonnet-5-cc`。三个 `-cc` 后缀是 DMXAPI 路由 ID 的一部分，发布包和说明均须原样保留。厂商模型能力和接口映射经过文档核对，但 DMXAPI 是否对任一接收者的 Key 开通全部 12 个 ID 尚未验证。
-
-## 推荐的正式发布方式
-
-目前采用 GitHub 公开仓库和 Releases；npm 是可选的补充分发方式：
-
-| 渠道 | 用途 |
-| --- | --- |
-| GitHub 公开仓库 | 开放源码、使用说明、问题反馈和版本记录 |
-| GitHub Releases | 附上同版本 ZIP 和 tgz，方便下载及留存 |
-| npm 公开包（可选，尚未发布） | 以后可提供按包名安装的方式 |
-
-DeepSeek Harness 官方支持按 npm 包名或预构建 tgz 安装 bundle。现有 `package.json` 已声明 `dsh.bundle` 和客户端入口，tgz 包含构建后的 `lib/`。[官方插件打包与安装指南](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md)
-
-### 1. 准备账号和项目信息
-
-维护者需要：
-
-- GitHub 仓库 `YV919/dmxapi-dsh` 已由作者提供。`package.json` 中的 `repository`、`homepage`、`bugs` 地址应指向该仓库。
-- 只有选择额外发布 npm 时才需要 npm 账号和发布认证。[npm 官方发布指南](https://docs.npmjs.com/creating-and-publishing-unscoped-public-packages/)
-
-2026-09-24 查询 npm 官方 registry 时，`dsh-dmxapi` 返回 E404，当前未发现公开同名包；这不等于已预留名称，也不保证后续发布一定可用。若以后需要改包名，必须同步修改 bundle 中引用的包名、安装脚本、构建产物和文档，重新验证后再发布。
-
-### 2. 先完成本地检查
-
-在完整项目源码目录依次运行：
+在源码目录执行：
 
 ```powershell
 npm ci
@@ -74,52 +16,75 @@ npm run pack:plugin
 npm pack --dry-run --json
 ```
 
-最后一条命令用于检查实际会进入 npm 包的文件名单；它不是发布命令。现有 `prepack` 会执行构建，因此请在已安装开发依赖的源码目录运行。
+检查包中包含 `lib/index.js`、`lib/client.js`、`lib/LICENSE.js-yaml`、`cordis.patch.yml`、`package.json`、README、LICENSE 和示例。确认源码、包和 ZIP 不含 `.research/`、`.qa/`、`.test-home/`、`.dsh/`、日志、个人配置、真实 API Key、凭据文件或 `.env`。检查实际打包名单，不能只依赖 `.gitignore`。
 
-确认 `lib/index.js`、`lib/client.js`、`lib/LICENSE.js-yaml`、`cordis.patch.yml`、`package.json`、README、LICENSE 和示例都在包中。检查 GitHub 源码和 ZIP 的实际文件清单，排除 `node_modules/`、`.research/`、`.test-home/`、`.qa/`、`.dsh/`、日志、个人设置、凭据文件、`.env` 及真实 API Key；仅依赖 `.gitignore` 不足以证明发布内容正确。
+使用独立 `DSH_HOME` / profile 验证预构建 `.tgz`：
 
-使用预构建 tgz 在独立测试 profile 中安装，确认只有四个入口，三种预设的模型顺序准确。先创建 Chat、Responses、Anthropic 路由，再分别在同一路由新增、修改和删除模型；检查保存后服务商 ID 不增加、原 URL/协议/密钥引用不变、其他路由不变。检查多个历史副本的选择、显式新建独立配置的自动编号、自定义服务商和 YAML 导入仍独立新增、手动重名拒绝、继承配置与并发写保护。密钥失败重试必须只写本次创建的独立凭据，不再次写 provider。用真实 Harness 和本地模拟 HTTP/SSE 服务检查三种协议的路径、认证、图片、思考字段，以及带规范数字后缀的新路由。特别检查 DeepSeek off 显式 disabled、GLM 无 off、Qwen medium/xhigh 同名透传、MiMo 开/关且不发 effort、GPT-6 Astra 与 Claude Fable/Opus 无 off、Sol/Luna off=none、Sonnet off=disabled，以及默认输出上限。容量快捷值为 262144/524288/1000000 和 65536/131072/262144，保留手工输入。使用虚构凭据验证默认隐藏、显示切换、随机引用隔离、留空不写凭据、保存清空，以及 YAML 和发布包不含密钥。升级前后对真实 settings/credentials 做哈希核对，不自动迁移用户配置。上线前另用维护者自己的测试凭据做真实接口验收，不要把模拟测试写成线上测试已通过。
+- 新工作台左侧 **插件 → DMXAPI-DSH配置工具** 能打开配置页；启停及重开页面没有重复注册。
+- 三个预设和自定义入口正常；在已有服务商新增、修改、删除模型时，服务商 ID 数量不增加，原地址、协议、密钥引用及其他路由保留。
+- 显式新建独立配置、历史副本选择、YAML 导入导出、同名拒绝、并发写保护与隐藏字段保护正常。
+- 用虚构凭据验证默认隐藏、显示切换、保存清空与新建凭据隔离；模型修改不读回或重写密钥。
+- 用本地 HTTP/SSE 服务验证 Chat、Responses、Anthropic 的地址、认证、图片、工具调用及思考字段，覆盖普通调用和 prepareCall；不将模拟验收写成真实 DMXAPI 模型验收。
+- Desktop 使用已安装桌面端自带的运行时验收；其 `desktop` profile 必须已经初始化，命令行安装前需完全退出桌面。npm CLI 只用于 Web，不写 Desktop profile。
 
-发布 `0.1.9` 时，还需检查新建草稿从旧 DeepSeek 预设切换到 Responses 与 Anthropic 后的保存及 YAML 导出：已知不兼容字段应被清理，合法字段保持原值，未知字段应保留供 Harness 校验，模型自定义配置和密钥应保留。DMXAPI 地址按 OpenAI `/v1`、Anthropic 根地址归一化，任意自定义地址不得被自动修改；编辑已有路由时不得修改地址或协议。高级配置需按模型显示适用传输方式，并保留已有自定义配置。模型默认值适配需覆盖普通请求与 prepareCall，尊重显式默认值和关闭思考选择，并在卸载时清理。只有另行完成对应真实模型请求后，才能宣称其线上能力已验证，不能据此宣称 DMXAPI 全部模型均支持所有协议及所有思考等级。
+所有兼容声明以实际通过的版本为准，不因 SDK 类型检查通过就宣称所有桌面版本可用。`engines.dsh` 和 peer 范围如含预发布版本，必须明确允许对应的版本元组。
 
-升级不改写旧 Qwen 映射。只有已新建或手工采用原生等级配置、会话却仍保留 `high/max` 时，才需展开 **思考等级** 菜单重选 `medium/xhigh`；仅重选同一模型不会清除旧等级。不要直接修改用户会话数据库。
+## 2. 发布 GitHub Release
 
-当前 `files` 没有包含 `scripts/`，这不会阻止安装 npm/tgz 预构建包：消费者使用 `lib/`，registry 安装不会执行 `prepack`。编译和重新打包则需要完整源码，不能让用户在解压后的 npm 包里执行源码构建步骤。[npm 脚本生命周期](https://docs.npmjs.com/misc/scripts/)
+提交检查后的源码并建立 `v0.2.0` 标签，将同一版本的以下资产上传到 Release：
 
-### 3. 公开源码与 Release；npm 可选
+- `dsh-dmxapi-0.2.0.tgz`：预构建插件，供工作台和社区市场安装。
+- `dsh-dmxapi-0.2.0-windows.zip`：包含安装脚本和说明的 Windows 分发包。
 
-向用户指定的公开仓库上传经检查的源码、锁文件、构建脚本、测试、MIT LICENSE 和文档。添加 `dsh-plugin` topic，便于别人发现插件；这是官方 README 推荐的方式。[DeepSeek Harness 官方 README](https://github.com/deepseek-ai/deepseek-harness/blob/master/README.md)
+ZIP 保留以下结构：
 
-以下仅是以后选择 npm 分发时的命令，**本次 GitHub Release 与市场收录不依赖 npm**：
-
-```powershell
-npm login --registry=https://registry.npmjs.org
-npm whoami --registry=https://registry.npmjs.org
-npm publish --registry=https://registry.npmjs.org
+```text
+dsh-dmxapi/
+├── install.ps1
+├── README.md
+├── QUICKSTART.md
+├── PUBLISHING.md
+├── LICENSE
+└── artifacts/
+    └── dsh-dmxapi-0.2.0.tgz
 ```
 
-`dsh-dmxapi` 是不带 scope 的包名，npm 中此类包是公开包。发布后先验证 registry 中版本存在，再在独立 profile 安装公开包，确认别人能正常获取。后续更改需要递增版本号，并同步更新版本相关的脚本和文档。[npm 官方发布指南](https://docs.npmjs.com/creating-and-publishing-unscoped-public-packages/)
+可同时附带 `examples/`。GitHub 自动生成的 Source code ZIP 不含被忽略的构建产物，不能替代上述安装 ZIP。发布后以公开下载链接重新获取 `.tgz`，核对内容并在独立 profile 安装。
 
-### 4. 提供给用户的安装方式
+安装地址：
 
-目前请下载 GitHub Release 中的 Windows ZIP，完整解压后执行 `install.ps1`；其他平台可下载同一 Release 的 `.tgz`，按照 Harness 官方文档用 `dsh plugin --profile <name> add ./dsh-dmxapi-0.1.9.tgz` 安装。以下按包名安装命令仅在额外发布 npm 后可用：
-
-```powershell
-npx --yes @deepseek-ai/dsh@0.1.5-rc.2 plugin --profile web add dsh-dmxapi@0.1.9
+```text
+https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0.tgz
 ```
 
-已运行的 Harness 需要重启后加载新插件。用户随后在设置页选择预设；首次新建服务商时填写自己的 Key，修改已有模型时沿用原密钥。仅安装公开插件不需要用户登录 npm。
+用户在工作台 **插件 → 添加插件** 粘贴地址，安装后选择 **立即启用**。Windows 脚本默认 `desktop`；`-Profile web` 才走 npm Harness。具体操作见 [QUICKSTART.md](QUICKSTART.md)。
 
-### 5. 添加 GitHub Release 下载
+## 3. 向社区插件市场投稿
 
-为同一份源码建立版本标签和 Release `v0.1.9`，上传经过检查的 `dsh-dmxapi-0.1.9-windows.zip` 与 `dsh-dmxapi-0.1.9.tgz`。GitHub 自动提供的源码 ZIP 不能代替含 `artifacts/` 的用户安装 ZIP；目前源码中的 `lib/` 和 `artifacts/` 被忽略，下载源码后仍需自行构建。[GitHub Releases 官方说明](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
+按 [awesome-dsh-plugin 投稿指南](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/contributing.md)，从其最新 `main` 创建分支，只添加或更新 `data/plugins/YV919__dmxapi-dsh.yml`：
 
-## 申请社区 dsh-market 收录
+```yaml
+url: https://github.com/YV919/dmxapi-dsh
+name: YV919/dmxapi-dsh
+category: model
+description:
+  en: Configure DMXAPI Chat Completions, Responses, Anthropic Messages, and custom providers; edit models on existing preset routes.
+  zh: 配置 DMXAPI Chat、Responses、Anthropic 和自定义服务商，并直接编辑已有预设服务商的模型。
+tarball: https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0.tgz
+```
 
-按 [awesome-dsh-plugin 投稿指南](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/contributing.md)向其目录仓库提交 PR，只新增 `data/plugins/YV919__dmxapi-dsh.yml`，不要手改生成的 README。条目使用 `category: model`，描述如实写明支持 DMXAPI 三种协议、已有路由的模型增改和自定义服务商，`tarball:` 指向固定的 `v0.1.9` Release `.tgz`。该目录要求源码仓库具有 `dsh.bundle`、`dsh-plugin` topic、真实代码，且创建满 24 小时；PR 合并后，社区 dsh-market 才会同步收录。这与 DeepSeek Harness 官方仓库的发布方式不同。
+PR 目标为 **awesome-dsh-plugin/awesome-dsh-plugin:main**，不是 DeepSeek Harness 或 dsh-market 的源码仓库。先搜索本插件是否已有条目或未合并 PR，避免重复投稿；升级时更新自己的原条目。不要手改自动生成的 README，也不要修改其他插件条目。
 
-## 暂不提供 GitHub 源码直装命令
+仓库需包含真实可运行代码和 `dsh.bundle` manifest，带 `dsh-plugin` topic，且创建满一天。描述应只说实际功能，不写营销承诺。CI 检查条目格式、仓库门槛和站点构建，维护者另行审核代码及声明；有问题时修复同一 PR。通过 CI 不等于已经收录。合并后目录自动重建，社区 dsh-market 从该目录获取插件。
 
-目前不要对外提供 `dsh plugin ... add github:用户名/仓库`。官方 dsh 文档说明，源码直装需要 `prepare` 构建，并且 pnpm 10 及以上会要求接收者允许构建脚本；本项目当前没有为这一安装路径提供已验证的 `prepare` 流程。发布到 npm 的预构建包和 Release 中的 tgz 更适合作为普通用户入口。[官方 GitHub 安装说明](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md#installing-from-github-the-build-script-catch)
+市场条目只使用指南支持的字段；不要添加 `npm`、`engines`。预构建地址须为 GitHub Release 托管的 HTTPS `.tgz`。本项目采用固定标签加版本化文件名，后续更新条目时一并更新；不要将 `releases/latest/download/` 与带版本的资产名组合。
 
-后续需要自动化发布时，可以配置 GitHub Actions 与 npm Trusted Publishing。它使用 OIDC，不需要在工作流中长期保存 npm 发布令牌；首版可以先手动发布，后续再增加此流程。[npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)
+截图可在本项目根目录放 `screenshots.json`，列出 1–8 个仓库内相对图片路径。截图需使用虚构凭据，不包含用户服务商密钥；无需把截图配置提交到目录仓库。
+
+## 安装与分发边界
+
+- 官方 Desktop 独占 `$DSH_HOME/profiles/desktop`。桌面内置 CLI 在应用完全退出后可管理插件，npm 安装的 dsh 不能代替它；脚本不修改 PATH。依据：[官方桌面说明](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.0-rc.2/apps/desktop/README.zh.md)。
+- 保留 `dsh.bundle` 和 `dsh.client` 元数据及预构建 `lib/`。官方依赖由宿主提供，不把另一套 Harness 核心运行时装入用户 profile。依据：[插件打包指南](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.0-rc.2/docs/user/develop/basic/publish.md)。
+- npm 是可选渠道，当前不要指导用户按 `dsh-dmxapi@0.2.0` 从 npm 安装。若以后发布，先核验包名、repository 和公开版本，再提供对应安装命令。
+- GitHub 源码直装还需要受支持的 `prepare` 构建及 pnpm 构建授权；当前普通用户使用 Release 预构建包。
+- 安装、升级不迁移原模型或会话，不修改用户原有 Qwen 等级映射。用户账号能调用哪些 DMXAPI 模型、是否支持图片和各思考参数，仍以其账号权限与真实接口测试为准。

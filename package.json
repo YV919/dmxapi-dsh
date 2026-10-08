@@ -1,7 +1,7 @@
 {
   "name": "dsh-dmxapi",
-  "version": "0.1.9",
-  "description": "DMXAPI-DSH配置工具：在 DeepSeek Harness Web 新增服务商，并直接编辑已有服务商的模型。",
+  "version": "0.2.0",
+  "description": "DMXAPI-DSH配置工具：在 DeepSeek Harness 桌面和 Web 工作台配置模型、密钥，并编辑已有服务商的模型。",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -13,13 +13,15 @@
     "url": "https://github.com/YV919/dmxapi-dsh/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "dsh": "0.2.0-rc.2 || 0.2.1-alpha.1"
   },
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
     "./client": "./lib/client.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./locale/*": "./locale/*"
   },
   "files": [
     "lib",
@@ -27,7 +29,8 @@
     "cordis.patch.yml",
     "examples",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "locale"
   ],
   "keywords": [
     "dsh-plugin",
@@ -43,7 +46,7 @@
       "platform": "web",
       "inject": [
         "@deepseek-ai/dsh-client-ui-settings",
-        "@deepseek-ai/dsh-client-ui-settings-plugins",
+        "@deepseek-ai/dsh-client-ui-plugin-manager",
         "@deepseek-ai/dsh-api-remotes"
       ]
     }
@@ -56,18 +59,16 @@
     "pack:plugin": "npm pack --pack-destination artifacts"
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "4.0.2",
-    "@deepseek-ai/dsh-api-remotes": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-api-settings-controller": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-attachment": "^0.1.5-rc.2",
-    "@deepseek-ai/dsh-client-ui-renderer": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-client-ui-settings": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-client-ui-settings-plugins": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-client-ui-slots": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-llm": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-llm-pi-ai": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-settings": "0.1.5-rc.2",
-    "@deepseek-ai/dsh-settings-file": "0.1.5-rc.2",
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-api-remotes": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-api-settings-controller": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-attachment": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-settings": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm-pi-ai": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-settings": "0.2.0-rc.2",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.0.0",
     "@types/react": "^18.3.1",
@@ -75,6 +76,17 @@
     "js-yaml": "^4.1.0",
     "react": "^18.3.1",
     "tsx": "^4.20.0",
-    "typescript": "~5.7.3"
+    "typescript": "~5.7.3",
+    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-app-boot": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-config-editor": "0.2.0-rc.2"
+  },
+  "icon": "./src/client/assets/dmxapi-icon.png",
+  "peerDependencies": {
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2 || 0.2.1-alpha.1",
+    "@deepseek-ai/dsh-llm-pi-ai": "0.2.0-rc.2 || 0.2.1-alpha.1",
+    "@deepseek-ai/dsh-settings": "0.2.0-rc.2 || 0.2.1-alpha.1",
+    "@deepseek-ai/dsh-client-ui-settings": "0.2.0-rc.2 || 0.2.1-alpha.1",
+    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2 || 0.2.1-alpha.1"
   }
 }

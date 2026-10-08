@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { createServer, type IncomingMessage } from 'node:http';
 import { Context } from '@deepseek-ai/cordis';
 import { AttachmentId, AttachmentStore, ImageVariantId } from '@deepseek-ai/dsh-attachment';
-import type { ImageAttachmentLimits, ImageAttachmentRef, ImageRequestPolicy, RequestImageAttachment, SaveImageAttachment, StoredImageAttachment } from '@deepseek-ai/dsh-attachment';
+import type { ImageAttachmentLimits, ImageAttachmentRef, ImageRequestTarget, RequestImageAttachment, SaveImageAttachment, StoredImageAttachment } from '@deepseek-ai/dsh-attachment';
 import LlmRuntime, { BlockAssembler, createUserMessage } from '@deepseek-ai/dsh-llm';
 import type { GenerateOptions } from '@deepseek-ai/dsh-llm';
 import * as LlmPiAi from '@deepseek-ai/dsh-llm-pi-ai';
@@ -78,7 +78,8 @@ export function testProfile(baseURL: string): PiAiProviderProfile {
   const config = LlmPiAi.Config({ providers: {
     [draft.id]: { ...draft.profile, apiKeyEnv: TEST_KEY_ENV, baseURL } as PiAiProviderProfile,
   } });
-  return config.providers![draft.id];
+  // Volatile snapshots are deeply frozen; tests edit detached drafts before boot.
+  return structuredClone(config.providers.get()[draft.id]) as PiAiProviderProfile;
 }
 
 export async function bootRuntime(profile: PiAiProviderProfile) {
@@ -89,7 +90,7 @@ export async function bootRuntime(profile: PiAiProviderProfile) {
 }
 
 export function textPrompt() {
-  return [createUserMessage({ content: [{ type: 'text', text: '请返回测试结果' }], source: { kind: 'plugin', plugin: 'dsh-dmxapi-test' } })];
+  return [createUserMessage({ content: [{ type: 'text', text: '请返回测试结果' }], source: { kind: 'user' } })];
 }
 
 export async function assemble(ctx: Context, options: Omit<GenerateOptions, 'provider' | 'model' | 'messages'> & Partial<Pick<GenerateOptions, 'provider' | 'model' | 'messages'>> = {}) {
@@ -97,7 +98,7 @@ export async function assemble(ctx: Context, options: Omit<GenerateOptions, 'pro
   const assembler = new BlockAssembler();
   for await (const chunk of ctx.llm.stream(request)) assembler.push(chunk);
   return {
-    message: assembler.message({ kind: 'model', provider: request.provider, model: request.model }),
+    message: assembler.message({ provider: request.provider, model: request.model }),
     finish: assembler.finish,
     usage: assembler.usage,
   };
@@ -121,7 +122,7 @@ export class FixtureAttachments extends AttachmentStore {
   async validateImage(_input: SaveImageAttachment): Promise<void> { throw new Error('Fixture does not admit uploads'); }
   async saveImage(_input: SaveImageAttachment): Promise<ImageAttachmentRef> { throw new Error('Fixture is read-only'); }
   async readImage(ref: ImageAttachmentRef): Promise<StoredImageAttachment> { return { ref, data: png }; }
-  override async readImageRequest(ref: ImageAttachmentRef, _policy: ImageRequestPolicy): Promise<RequestImageAttachment> {
+  override async readImageRequest(ref: ImageAttachmentRef, _target: ImageRequestTarget): Promise<RequestImageAttachment> {
     if (ref.attachmentId !== IMAGE_REF.attachmentId) throw new Error('Unexpected attachment');
     this.requests++;
     return { variantId: ImageVariantId(`sha256:${'b'.repeat(64)}`), attachment: ref, data: png, mediaType: 'image/png', bytes: png.length, width: 1, height: 1, depth: 'uchar', space: 'srgb', hasAlpha: true };

@@ -1,37 +1,59 @@
-# DMXAPI-DSH配置工具安装说明（Windows）
+# DMXAPI-DSH配置工具安装指南
 
-适用：DeepSeek Harness Web `0.1.5-rc.2`。需要先安装 Node.js 22 或更新版本，并能访问 npm 和 DMXAPI。
+插件 `0.2.0` 适用于 DeepSeek Harness Desktop / Web `0.2.0-rc.2`。每位用户需要自己的 DMXAPI API Key。旧 Harness Web `0.1.5-rc.2` 请使用插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
 
-## 安装
+## 推荐：在工作台安装
 
-1. 完整解压 ZIP；保留 `install.ps1` 和 `artifacts` 文件夹的相对位置。
-2. 在解压后的文件夹打开 PowerShell，执行：
+1. 打开 Harness，在左侧选择 **插件 → 添加插件**。
+2. 粘贴以下地址并点击 **安装**：
 
-   ```powershell
-   .\install.ps1
+   ```text
+   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0.tgz
    ```
 
-3. 安装成功后关闭已有 Harness 服务，再启动：
+3. 安装成功后点击 **立即启用**；如果界面要求重启，按提示完成。
+4. 在 **插件** 中打开 **DMXAPI-DSH配置工具**。
 
-   ```powershell
-   npx --yes @deepseek-ai/dsh@0.1.5-rc.2 web
-   ```
+这一方式适用于桌面端和 Web，不需要执行安装脚本。桌面端使用其内置运行时和包管理器。压缩包下载和依赖安装需要联网；GitHub 不可达时可先下载 `.tgz`，在 **添加插件** 中填写该文件的完整绝对路径。
 
-安装过程需要联网下载 Harness 及依赖。默认安装到当前用户 `.dsh` 的 `web` profile；使用自定义 `DSH_HOME` 的用户，应在设置了相同变量的终端中运行安装和启动命令。
+## Windows ZIP 与安装脚本
 
-若系统提示脚本未签名或禁止执行，请按你所在设备的 PowerShell 脚本策略处理，或使用下面的手动安装方式，无需修改系统执行策略：
+下载 [dsh-dmxapi-0.2.0-windows.zip](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0-windows.zip)，完整解压，保留 `install.ps1` 与 `artifacts/` 的相对位置。不要在 ZIP 预览窗口中直接运行。
+
+**桌面端：** 先启动一次官方 DeepSeek Harness Desktop `0.2.0-rc.2`，再从应用菜单或系统托盘选择 **退出**。仅关闭窗口可能仍在后台运行。在解压目录打开 PowerShell：
 
 ```powershell
-$dmxHome = if ($env:DSH_HOME) { $env:DSH_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.dsh' }
-$dmxStore = Join-Path $dmxHome 'profiles\web\local-packages'
-New-Item -ItemType Directory -Path $dmxStore -Force | Out-Null
-Copy-Item -LiteralPath '.\artifacts\dsh-dmxapi-0.1.9.tgz' -Destination $dmxStore -Force
-npx.cmd --yes @deepseek-ai/dsh@0.1.5-rc.2 plugin --profile web add file:local-packages/dsh-dmxapi-0.1.9.tgz
+.\install.ps1
 ```
+
+脚本默认安装到 `desktop` profile，自动寻找桌面安装目录，只使用其中的 `resources/runtime/cli/bin/dsh.cmd`。找不到目录时明确指定：
+
+```powershell
+.\install.ps1 -DesktopPath 'C:\Users\你的用户名\AppData\Local\Programs\DeepSeek Harness'
+```
+
+`-DesktopPath` 填包含 `DeepSeek Harness.exe` 的安装目录。脚本不修改 PATH，不另装 Node.js，也不会使用 npm CLI 创建或修改 Desktop profile。安装成功后重新打开桌面端。
+
+**Web：** 安装 Node.js `^22.19.0` 或 `>=24.0.0`，关闭已有 Web 服务后执行：
+
+```powershell
+.\install.ps1 -Profile web
+npx --yes @deepseek-ai/dsh@0.2.0-rc.2 web
+```
+
+Web 安装会从 npm 获取指定版本的 Harness。两个模式都遵循当前终端的 `DSH_HOME`；未设置时使用用户目录下的 `.dsh`。安装和启动必须使用相同的 `DSH_HOME`。脚本将压缩包保留在对应 profile 的 `local-packages/`，用于后续重装，并避免中文或空格路径在多层命令转发中被拆开。
+
+如果 PowerShell 阻止脚本执行，直接使用上面的工作台安装方式，无需更改系统执行策略。
+
+## 从旧版本升级
+
+在同一个 Desktop 或 Web profile 中升级；两种客户端的插件安装状态相互独立，Web 已安装不代表 Desktop 也已安装。新版 Harness 工作台没有独立的版本选择器：如果 **添加插件** 提示包已存在，可在插件页卸载旧版，再从新版本 `.tgz` 安装并启用，或退出相应客户端后运行本版本安装脚本。插件卸载、安装不删除已保存的服务商及密钥；不要手工删除 `.dsh` 或整个 profile。
+
+升级完成后打开左侧 **插件**。旧版“设置 → 插件 → 插件配置”入口已由工作台插件页替代。
 
 ## 配置服务商与模型
 
-1. 打开 **设置 → 插件 → 插件配置 → DMXAPI-DSH配置工具**。
+1. 打开工作台左侧 **插件 → DMXAPI-DSH配置工具**。
 2. 选择 **DMXAPI · Chat**、**DMXAPI · Responses**、**DMXAPI · Anthropic** 或 **新建自定义服务商**。前三项每份配置只对应一种协议；若同 ID、同协议的预设服务商已存在，插件优先打开它。存在历史副本时，可选择要编辑的路由；只有明确选择 **新建独立配置** 才会另外创建一份服务商。
 3. 展开需要调整的模型卡，新增或修改模型，并核对图片输入、思考选项和容量。卡片只显示该模型已有的选项，可按需求添加或移除；传输方式与 YAML 在折叠的高级配置中。
 4. 首次新建服务商时，在 **API Key** 输入框填写自己的密钥并点击 **新增配置**。输入默认隐藏，点击 **显示** 可查看正在填写的内容，也可切回 **隐藏**；无需设置环境变量。编辑已有服务商时直接点击 **保存模型修改**，无需重新填写密钥；这一步只更新模型列表和在表单中调整的默认思考等级，不改动原 API Key、地址或协议。

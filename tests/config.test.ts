@@ -24,7 +24,7 @@ test('预设路由只识别原 ID 与规范数字后缀，模型默认还核对�
 test('Host schema 默认字段可在重新载入后再次编辑保存', () => {
   const draft = createDmxapiDraft();
   const normalized = HostConfig({ providers: { dmxapi: draft.profile as never } });
-  const profile = normalized.providers!.dmxapi as unknown as ProviderDraft['profile'];
+  const profile = structuredClone(normalized.providers.get().dmxapi) as unknown as ProviderDraft['profile'];
   assert.deepEqual(profile.modelOverrides, {});
   assert.doesNotThrow(() => validateDraft({ id: 'dmxapi', profile }));
   profile.models!.push({ id: 'new-model', input: ['text'] });

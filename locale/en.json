@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "DMXAPI-DSH Configuration",
+    "description": "Configure DMXAPI and custom model providers in the DeepSeek Harness workbench. Supports Chat Completions, Responses, Anthropic Messages, and editing models on existing providers."
+  }
+}

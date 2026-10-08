@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { dump, JSON_SCHEMA } from 'js-yaml';
-import dmxapiIcon from './assets/dmxapi.png';
+import type { PluginConfigViewProps } from '@deepseek-ai/dsh-client-ui-plugin-manager/client';
 import type { SaveConfigurationResult } from './save-configuration.ts';
 import { createNewProviderDraft, existingPresetProviderIds, makeProviderDraftUnique, selectProviderDraft, type NewProviderKind } from '../new-provider.ts';
 import { assertExistingModelEdit, redactHiddenYamlFields, restoreHiddenYamlFields } from '../model-edit.ts';
@@ -41,6 +41,12 @@ export interface DmxapiCardProps {
   save: (draft: ProviderDraft, revision: number, apiKey: string) => Promise<SaveConfigurationResult>;
   updateModels: (draft: ProviderDraft, revision: number) => Promise<{ revision: number }>;
   retryCredential: (receipt: SaveConfigurationResult, apiKey: string) => Promise<SaveConfigurationResult>;
+}
+
+/** The workbench owns the plugin title and icon; this entry owns its form. */
+export function DmxapiWorkbench({ view, ...props }: DmxapiCardProps & Pick<PluginConfigViewProps, 'view'>) {
+  if (view === 'summary') return <>快速配置 Chat、Responses、Anthropic 服务商与模型。</>;
+  return <div className="dmx-workbench"><DmxapiCard {...props} /></div>;
 }
 
 const copy = <T,>(value: T): T => structuredClone(value);
@@ -497,18 +503,12 @@ export function DmxapiCard({ store, save, updateModels, retryCredential }: Dmxap
     (modeSelections[index] ?? inferReasoningMode(model, draft.profile.api, draft.id)) === 'chat-switch' &&
     isSimpleSwitch(readEffortMap(efforts[index] ?? '').value));
   return (
-    <section className="dmx-card" aria-labelledby={`${uid}-title`}>
-      <header className="dmx-header">
-        <img className="dmx-brand" src={dmxapiIcon} alt="DMXAPI" />
-        <div className="dmx-heading">
-          <h2 id={`${uid}-title`}>DMXAPI-DSH配置工具</h2>
-          <p>快速配置第三方 API、图片输入和模型思考等级。</p>
-        </div>
-      </header>
+    <section className="dmx-card" aria-label="模型服务商配置">
+      <p className="dmx-intro">选择服务商配置 API、模型和思考等级，保存后即可在工作台选择模型。</p>
 
-      {snapshot.status === 'unavailable' && <div className="dmx-alert" role="alert">无法读取模型配置。请确认 llm-pi-ai 已启用，然后重新打开设置。</div>}
+      {snapshot.status === 'unavailable' && snapshot.mode !== 'memory' && <div className="dmx-alert" role="alert">无法读取模型配置。请确认 llm-pi-ai 已启用，然后重新打开插件页面。</div>}
       {snapshot.status === 'ready' && !snapshot.writable && <div className="dmx-note">当前配置为只读。请在有写入权限的 Harness 实例中编辑。</div>}
-      {snapshot.mode === 'memory' && <div className="dmx-note">当前设置仅保存在内存中，重启后不会保留。</div>}
+      {snapshot.mode === 'memory' && <div className="dmx-note">当前连接不允许保存服务商配置。请使用本机桌面工作台或本机 Web 界面。</div>}
 
       <form noValidate onSubmit={event => { event.preventDefault(); void saveDraft(); }}>
         <fieldset className="dmx-fields" disabled={locked || !!pendingCredential}>

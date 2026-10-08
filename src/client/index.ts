@@ -1,21 +1,21 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
-import type {} from '@deepseek-ai/dsh-client-ui-settings-plugins/client'
+import type {} from '@deepseek-ai/dsh-client-ui-plugin-manager/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type { SettingsPathOpView, SettingsNamespaceView } from '@deepseek-ai/dsh-api-remotes/client'
 import type { ProviderProfile, ProviderDraft } from '../config.ts'
-import { DmxapiCard } from './Card.tsx'
+import { DmxapiWorkbench } from './Card.tsx'
 import { saveProvider, saveProviderModels } from './save-provider.ts'
 import { retryConfigurationCredential, saveConfiguration, type SaveConfigurationResult } from './save-configuration.ts'
 import css from './styles.css'
 
-export const inject = ['slots', 'settingsScope', 'remote', 'remote.settings', 'remote.credentials']
+export const inject = ['slots', 'configForms', 'remote', 'remote.settings', 'remote.credentials']
 
 export function apply(ctx: Context): void {
-  const scope = ctx.settingsScope.bind<{ providers?: Record<string, ProviderProfile> }>({ namespace: 'llm-pi-ai' })
-  const mirror = ctx.settingsScope.describe()
+  const scope = ctx.configForms.get<{ providers?: Record<string, ProviderProfile> }>('llm-pi-ai')
+  const mirror = ctx.configForms.describe()
   ctx.effect(() => {
     const style = document.createElement('style')
     style.dataset.plugin = 'dsh-dmxapi'
@@ -24,9 +24,9 @@ export function apply(ctx: Context): void {
     return () => { style.remove() }
   }, 'dmxapi-settings: styles')
 
-  ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({
-    name: 'settings.plugin.item',
-    key: 'llm-pi-ai',
+  ctx.slots.inject('plugins.bundle.config', () => ctx.slots.register({
+    name: 'plugins.bundle.config',
+    key: 'dsh-dmxapi',
     inject: () => ({
       store: {
         getSnapshot: () => scope.getSnapshot(),
@@ -51,5 +51,5 @@ export function apply(ctx: Context): void {
         setCredential: (ref, value) => ctx.remote.credentials.set(ref, value),
       }),
     }),
-  }, DmxapiCard))
+  }, DmxapiWorkbench))
 }

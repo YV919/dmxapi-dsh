@@ -1,8 +1,9 @@
 import type { Context } from '@deepseek-ai/cordis';
-import type { Api, Context as PiContext, Model, Provider, SimpleStreamOptions } from '@earendil-works/pi-ai';
+import type { Api, Model, Provider } from '@earendil-works/pi-ai';
+import type {} from '@deepseek-ai/dsh-settings';
 import { dmxapiProtocolForProvider } from './config.ts';
 
-// This bridge targets the Host 0.1.5-rc.2 snapshot seam verified by the tests.
+// This bridge targets the Host 0.2.0-rc.2 snapshot seam verified by the tests.
 // It never imports a second runtime copy of llm-pi-ai from the plugin package.
 const PATCH = Symbol.for('dsh-dmxapi.anthropic-enabled-effort.v1');
 const ACTIVE = Symbol.for('dsh-dmxapi.anthropic-enabled-effort.owner.v1');
@@ -56,7 +57,7 @@ function patchProvider(provider: PatchedProvider): void {
   if (provider[PATCH]) return;
   const original = provider.streamSimple;
   if (typeof original !== 'function') throw new Error('Harness pi-ai provider 缺少 streamSimple，DMXAPI Anthropic 适配无法启用。');
-  const wrapper: StreamSimple = function (model, context: PiContext, options?: SimpleStreamOptions) {
+  const wrapper: StreamSimple = function (model, context, options) {
     if (!optedIn(model)) return original.call(provider, model, context, options);
     const callerPayload = options?.onPayload;
     return original.call(provider, model, context, {
