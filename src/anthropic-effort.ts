@@ -3,7 +3,8 @@ import type { Api, Model, Provider } from '@earendil-works/pi-ai';
 import type {} from '@deepseek-ai/dsh-settings';
 import { dmxapiProtocolForProvider } from './config.ts';
 
-// This bridge targets the Host 0.2.0-rc.2 snapshot seam verified by the tests.
+// This bridge targets the Host 0.2.0-rc.2 / 0.2.1-alpha.2 snapshot seams
+// verified by the tests.
 // It never imports a second runtime copy of llm-pi-ai from the plugin package.
 const PATCH = Symbol.for('dsh-dmxapi.anthropic-enabled-effort.v1');
 const ACTIVE = Symbol.for('dsh-dmxapi.anthropic-enabled-effort.owner.v1');
@@ -34,7 +35,8 @@ function isSnapshot(value: unknown): value is Snapshot {
 /** Only the DeepSeek Anthropic compatibility dialect needs this correction. */
 function optedIn(model: Model<Api>): boolean {
   return dmxapiProtocolForProvider(model.provider) === 'anthropic' && model.api === 'anthropic-messages' &&
-    /^deepseek[-.]/i.test(model.id) && isRecord(model.compat) && model.compat.forceAdaptiveThinking === true;
+    /^deepseek[-.]/i.test(model.id) && isRecord(model.compat) &&
+    (model.compat as Record<string, unknown>).forceAdaptiveThinking === true;
 }
 
 export function enabledEffortPayload(value: unknown, model: Model<Api>, reasoning: string | undefined): unknown {

@@ -12,7 +12,8 @@ import * as LlmPiAi from '@deepseek-ai/dsh-llm-pi-ai';
 import type { ProviderProfile } from '../src/config.ts';
 
 /** Real 0.2 profile patches, Loader reconciliation and schema-derived settings.
- * Based on the official settings/tests/configuration-fixture.ts at dsh-v0.2.0-rc.2.
+ * Based on the official settings/tests/configuration-fixture.ts at dsh-v0.2.0-rc.2;
+ * the same profile contract is exercised against the 0.2.1-alpha.2 SDK fixture.
  * This fixture owns an isolated installation tree; it never opens the user's DSH_HOME.
  */
 export async function settingsFixture(t: TestContext, providers: Record<string, ProviderProfile> = {}) {

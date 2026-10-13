@@ -1,6 +1,6 @@
 # DMXAPI-DSH配置工具安装指南
 
-插件 `0.2.0` 适用于 DeepSeek Harness Desktop / Web `0.2.0-rc.2`。每位用户需要自己的 DMXAPI API Key。旧 Harness Web `0.1.5-rc.2` 请使用插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
+插件 `0.2.1` 适用于 DeepSeek Harness Desktop / Web `0.2.0-rc.2`，并已通过 `0.2.1-alpha.2` SDK / runtime 兼容验证。每位用户需要自己的 DMXAPI API Key。旧 Harness Web `0.1.5-rc.2` 请使用插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
 
 ## 推荐：在工作台安装
 
@@ -8,7 +8,7 @@
 2. 粘贴以下地址并点击 **安装**：
 
    ```text
-   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0.tgz
+   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.1/dsh-dmxapi-0.2.1.tgz
    ```
 
 3. 安装成功后点击 **立即启用**；如果界面要求重启，按提示完成。
@@ -18,7 +18,7 @@
 
 ## Windows ZIP 与安装脚本
 
-下载 [dsh-dmxapi-0.2.0-windows.zip](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0-windows.zip)，完整解压，保留 `install.ps1` 与 `artifacts/` 的相对位置。不要在 ZIP 预览窗口中直接运行。
+下载 [dsh-dmxapi-0.2.1-windows.zip](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.1/dsh-dmxapi-0.2.1-windows.zip)，完整解压，保留 `install.ps1` 与 `artifacts/` 的相对位置。不要在 ZIP 预览窗口中直接运行。
 
 **桌面端：** 先启动一次官方 DeepSeek Harness Desktop `0.2.0-rc.2`，再从应用菜单或系统托盘选择 **退出**。仅关闭窗口可能仍在后台运行。在解压目录打开 PowerShell：
 

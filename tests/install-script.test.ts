@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import test from 'node:test'
 
 const windows = process.platform === 'win32'
-const packageName = 'dsh-dmxapi-0.2.0.tgz'
+const packageName = 'dsh-dmxapi-0.2.1.tgz'
 const quote = (value: string) => `'${value.replaceAll("'", "''")}'`
 
 function fixture() {

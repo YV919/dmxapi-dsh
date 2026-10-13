@@ -4,7 +4,7 @@ param(
     [string]$DesktopPath
 )
 $ErrorActionPreference = 'Stop'
-$dmxVersion = '0.2.0'
+$dmxVersion = '0.2.1'
 $dmxPackageName = "dsh-dmxapi-$dmxVersion.tgz"
 $dmxPackage = Join-Path $PSScriptRoot "artifacts\$dmxPackageName"
 if (-not (Test-Path -LiteralPath $dmxPackage -PathType Leaf)) {

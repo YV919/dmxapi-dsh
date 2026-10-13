@@ -1,6 +1,6 @@
 {
   "name": "dsh-dmxapi",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "DMXAPI-DSH配置工具：在 DeepSeek Harness 桌面和 Web 工作台配置模型、密钥，并编辑已有服务商的模型。",
   "type": "module",
   "license": "MIT",
@@ -14,7 +14,7 @@
   },
   "engines": {
     "node": ">=22",
-    "dsh": "0.2.0-rc.2 || 0.2.1-alpha.1"
+    "dsh": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2"
   },
   "main": "lib/index.js",
   "exports": {
@@ -83,10 +83,10 @@
   },
   "icon": "./src/client/assets/dmxapi-icon.png",
   "peerDependencies": {
-    "@deepseek-ai/dsh-llm": "0.2.0-rc.2 || 0.2.1-alpha.1",
-    "@deepseek-ai/dsh-llm-pi-ai": "0.2.0-rc.2 || 0.2.1-alpha.1",
-    "@deepseek-ai/dsh-settings": "0.2.0-rc.2 || 0.2.1-alpha.1",
-    "@deepseek-ai/dsh-client-ui-settings": "0.2.0-rc.2 || 0.2.1-alpha.1",
-    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2 || 0.2.1-alpha.1"
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-llm-pi-ai": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-settings": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-client-ui-settings": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2"
   }
 }

@@ -17,7 +17,7 @@
 <p align="center">
   <a href="https://github.com/YV919/dmxapi-dsh/releases"><img src="https://img.shields.io/github/v/release/YV919/dmxapi-dsh?label=Release" alt="GitHub Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/YV919/dmxapi-dsh" alt="MIT License" /></a>
-  <img src="https://img.shields.io/badge/DeepSeek%20Harness-0.2.0--rc.2-0f766e" alt="支持 DeepSeek Harness Desktop / Web 0.2.0-rc.2" />
+  <img src="https://img.shields.io/badge/DeepSeek%20Harness-0.2.x-0f766e" alt="支持 DeepSeek Harness 0.2.x 工作台" />
 </p>
 
 ---
@@ -39,18 +39,18 @@
 
 ## 快速开始
 
-**插件 `0.2.0` 适用于 DeepSeek Harness Desktop / Web `0.2.0-rc.2`。** 使用旧 Harness Web `0.1.5-rc.2` 的用户请保留插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
+**插件 `0.2.1` 适用于 DeepSeek Harness Desktop / Web `0.2.0-rc.2`，并已通过 `0.2.1-alpha.2` SDK / runtime 兼容验证。** 使用旧 Harness Web `0.1.5-rc.2` 的用户请保留插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
 
 1. 在 Harness 工作台左侧打开 **插件 → 添加插件**，粘贴下面的预构建安装包地址：
 
    ```text
-   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0.tgz
+   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.1/dsh-dmxapi-0.2.1.tgz
    ```
 
 2. 点击 **安装**，完成后选择 **立即启用**。如果 Harness 提示需要重启，请按提示重启。
 3. 打开 **插件 → DMXAPI-DSH配置工具**，选择接口预设。首次创建服务商时填写自己的 DMXAPI API Key 并点击 **新增配置**；已有同 ID、同协议服务商时，直接增改模型并点击 **保存模型修改**。回到聊天，从原生模型菜单选择模型。
 
-Windows 用户也可下载 [v0.2.0 安装 ZIP](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0-windows.zip)，完整解压，先启动过桌面端并从系统托盘完全退出，再运行 `./install.ps1`。脚本默认安装到 `desktop` profile，只使用已安装桌面端自带的运行时，不需要另外安装 Node.js，也不会修改 PATH。找不到安装目录时可指定 `-DesktopPath "C:\你的安装目录\DeepSeek Harness"`。Web 用户明确运行 `./install.ps1 -Profile web`，需要 Node.js `^22.19.0` 或 `>=24.0.0`。详细步骤和升级方式见 [QUICKSTART.md](QUICKSTART.md)。
+Windows 用户也可下载 [v0.2.1 安装 ZIP](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.1/dsh-dmxapi-0.2.1-windows.zip)，完整解压，先启动过桌面端并从系统托盘完全退出，再运行 `./install.ps1`。脚本默认安装到 `desktop` profile，只使用已安装桌面端自带的运行时，不需要另外安装 Node.js，也不会修改 PATH。找不到安装目录时可指定 `-DesktopPath "C:\你的安装目录\DeepSeek Harness"`。Web 用户明确运行 `./install.ps1 -Profile web`，需要 Node.js `^22.19.0` 或 `>=24.0.0`。详细步骤和升级方式见 [QUICKSTART.md](QUICKSTART.md)。
 
 GitHub Release 提供公开安装包；社区插件市场的收录状态以[投稿 PR](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pulls?q=dmxapi-dsh)和市场目录为准。
 
@@ -164,9 +164,9 @@ npx --yes @deepseek-ai/dsh@0.2.0-rc.2 plugin --profile web remove dsh-dmxapi
 
 自动化测试使用本地模拟 HTTP/SSE 服务以及真实发布版 Harness runtime，验证配置到实际请求参数的链路，不会向 DMXAPI 发送付费请求。
 
-`0.2.0` 已分别通过 Harness `0.2.0-rc.2` 与 `0.2.1-alpha.1` SDK / runtime 的 116 项自动化测试，覆盖新版工作台插件入口、桌面安装边界、三种协议、思考参数、图片与凭据隔离，以及已有服务商的模型增改、保存并发和重启持久化。本地模拟测试不代表 DMXAPI 的全部模型或其他供应商模型均已通过真实接口验收。
+`0.2.1` 已分别通过 Harness `0.2.0-rc.2`、`0.2.1-alpha.1` 与 `0.2.1-alpha.2` SDK / runtime 的 116 项自动化测试，覆盖新版工作台插件入口、桌面安装边界、三种协议、思考参数、图片与凭据隔离，以及已有服务商的模型增改、保存并发和重启持久化。本地模拟测试不代表 DMXAPI 的全部模型或其他供应商模型均已通过真实接口验收。
 
-2026-10-08 在 Windows 的 Harness Desktop `0.2.0-rc.2` 完成实际安装与界面验收：插件列表正确显示名称、图标和版本，配置页正常打开，插件已启用；安装前后核对的 4 个原有模型配置与凭据文件内容一致。`0.2.1-alpha.1` 的验证范围为隔离环境中的 SDK / runtime 测试，未宣称完成该预览版桌面界面验收。
+2026-10-08 在 Windows 的 Harness Desktop `0.2.0-rc.2` 完成实际安装与界面验收：插件列表正确显示名称、图标和版本，配置页正常打开，插件已启用；安装前后核对的 4 个原有模型配置与凭据文件内容一致。`0.2.1-alpha.1` 与 `0.2.1-alpha.2` 的验证范围为隔离环境中的 SDK / runtime 测试，未宣称完成该预览版桌面界面验收。
 
 API Key 输入界面的验收使用隔离 profile 和虚构凭据，检查默认隐藏、显示切换、保存与导出隔离；这一流程不需要真实 Key，也不调用付费模型。验收结果以对应版本的测试记录为准。
 

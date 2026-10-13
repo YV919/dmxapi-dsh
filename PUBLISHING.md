@@ -1,6 +1,6 @@
 # 发布与市场投稿
 
-源码仓库：[YV919/dmxapi-dsh](https://github.com/YV919/dmxapi-dsh)。插件 `0.2.0` 面向 DeepSeek Harness Desktop / Web `0.2.0-rc.2`，通过 GitHub Release 提供预构建包，尚未发布 npm。旧 Harness Web `0.1.5-rc.2` 使用插件 `0.1.9`。
+源码仓库：[YV919/dmxapi-dsh](https://github.com/YV919/dmxapi-dsh)。插件 `0.2.1` 面向 DeepSeek Harness Desktop / Web `0.2.0-rc.2`，并已通过 `0.2.1-alpha.2` SDK / runtime 兼容验证；通过 GitHub Release 提供预构建包，尚未发布 npm。旧 Harness Web `0.1.5-rc.2` 使用插件 `0.1.9`。
 
 GitHub Release 发布、市场投稿和市场收录是三个阶段。只有目录维护者合并投稿、市场完成同步后，才能称“已在市场上架”。当前状态以[投稿 PR](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pulls?q=dmxapi-dsh)和[社区目录](https://awesome-dsh-plugin.com/)为准。
 
@@ -31,10 +31,10 @@ npm pack --dry-run --json
 
 ## 2. 发布 GitHub Release
 
-提交检查后的源码并建立 `v0.2.0` 标签，将同一版本的以下资产上传到 Release：
+提交检查后的源码并建立 `v0.2.1` 标签，将同一版本的以下资产上传到 Release：
 
-- `dsh-dmxapi-0.2.0.tgz`：预构建插件，供工作台和社区市场安装。
-- `dsh-dmxapi-0.2.0-windows.zip`：包含安装脚本和说明的 Windows 分发包。
+- `dsh-dmxapi-0.2.1.tgz`：预构建插件，供工作台和社区市场安装。
+- `dsh-dmxapi-0.2.1-windows.zip`：包含安装脚本和说明的 Windows 分发包。
 
 ZIP 保留以下结构：
 
@@ -46,7 +46,7 @@ dsh-dmxapi/
 ├── PUBLISHING.md
 ├── LICENSE
 └── artifacts/
-    └── dsh-dmxapi-0.2.0.tgz
+    └── dsh-dmxapi-0.2.1.tgz
 ```
 
 可同时附带 `examples/`。GitHub 自动生成的 Source code ZIP 不含被忽略的构建产物，不能替代上述安装 ZIP。发布后以公开下载链接重新获取 `.tgz`，核对内容并在独立 profile 安装。
@@ -54,7 +54,7 @@ dsh-dmxapi/
 安装地址：
 
 ```text
-https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0.tgz
+https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.1/dsh-dmxapi-0.2.1.tgz
 ```
 
 用户在工作台 **插件 → 添加插件** 粘贴地址，安装后选择 **立即启用**。Windows 脚本默认 `desktop`；`-Profile web` 才走 npm Harness。具体操作见 [QUICKSTART.md](QUICKSTART.md)。
@@ -70,7 +70,7 @@ category: model
 description:
   en: Configure DMXAPI Chat Completions, Responses, Anthropic Messages, and custom providers; edit models on existing preset routes.
   zh: 配置 DMXAPI Chat、Responses、Anthropic 和自定义服务商，并直接编辑已有预设服务商的模型。
-tarball: https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.0/dsh-dmxapi-0.2.0.tgz
+tarball: https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.1/dsh-dmxapi-0.2.1.tgz
 ```
 
 PR 目标为 **awesome-dsh-plugin/awesome-dsh-plugin:main**，不是 DeepSeek Harness 或 dsh-market 的源码仓库。先搜索本插件是否已有条目或未合并 PR，避免重复投稿；升级时更新自己的原条目。不要手改自动生成的 README，也不要修改其他插件条目。
@@ -85,6 +85,6 @@ PR 目标为 **awesome-dsh-plugin/awesome-dsh-plugin:main**，不是 DeepSeek Ha
 
 - 官方 Desktop 独占 `$DSH_HOME/profiles/desktop`。桌面内置 CLI 在应用完全退出后可管理插件，npm 安装的 dsh 不能代替它；脚本不修改 PATH。依据：[官方桌面说明](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.0-rc.2/apps/desktop/README.zh.md)。
 - 保留 `dsh.bundle` 和 `dsh.client` 元数据及预构建 `lib/`。官方依赖由宿主提供，不把另一套 Harness 核心运行时装入用户 profile。依据：[插件打包指南](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.0-rc.2/docs/user/develop/basic/publish.md)。
-- npm 是可选渠道，当前不要指导用户按 `dsh-dmxapi@0.2.0` 从 npm 安装。若以后发布，先核验包名、repository 和公开版本，再提供对应安装命令。
+- npm 是可选渠道，当前不要指导用户按 `dsh-dmxapi@0.2.1` 从 npm 安装。若以后发布，先核验包名、repository 和公开版本，再提供对应安装命令。
 - GitHub 源码直装还需要受支持的 `prepare` 构建及 pnpm 构建授权；当前普通用户使用 Release 预构建包。
 - 安装、升级不迁移原模型或会话，不修改用户原有 Qwen 等级映射。用户账号能调用哪些 DMXAPI 模型、是否支持图片和各思考参数，仍以其账号权限与真实接口测试为准。

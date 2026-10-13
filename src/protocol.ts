@@ -149,7 +149,8 @@ export function inferReasoningMode(model: ModelProfile, api: string | undefined,
   return 'custom';
 }
 
-// Configurable fields exposed by dsh-llm-pi-ai 0.1.5-rc.2, not every field in pi-ai.
+// Configurable fields exposed by the verified 0.2.x Harness adapters, not every
+// field in pi-ai. Unknown fields remain visible so Host validation can report them.
 const COMPAT_FIELDS: Record<string, readonly string[]> = {
   'openai-completions': [
     'supportsStore', 'supportsDeveloperRole', 'supportsReasoningEffort',
