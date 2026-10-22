@@ -3,7 +3,8 @@ import type { Api, Model, Provider } from '@earendil-works/pi-ai';
 import type {} from '@deepseek-ai/dsh-settings';
 import { dmxapiProtocolForProvider } from './config.ts';
 
-// This bridge targets the Host 0.2.0-rc.2 / 0.2.1-alpha.2 snapshot seams
+// This bridge preserves the Host 0.2.0-rc.2 / 0.2.1-alpha.2 seams and is
+// admitted by the current 0.2.1-rc.2 compatibility metadata.
 // verified by the tests.
 // It never imports a second runtime copy of llm-pi-ai from the plugin package.
 const PATCH = Symbol.for('dsh-dmxapi.anthropic-enabled-effort.v1');
