@@ -1,6 +1,6 @@
 # DMXAPI-DSH配置工具安装指南
 
-插件 `0.2.2` 适用于 DeepSeek Harness Desktop / Web `0.2.1-rc.2`，并保留对 `0.2.0-rc.2`、`0.2.1-alpha.1` 和 `0.2.1-alpha.2` 的兼容声明。每位用户需要自己的 DMXAPI API Key。旧 Harness Web `0.1.5-rc.2` 请使用插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
+插件 `0.2.3` 使用统一的 DSH 兼容范围 `>=0.2.0-rc.2 <0.3.0-0`，已用当前桌面端 `0.2.1-rc.3` 验证，并覆盖同一 `0.2.x` 兼容线的预发布版本。每位用户需要自己的 DMXAPI API Key。旧 Harness Web `0.1.5-rc.2` 请使用插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
 
 ## 推荐：在工作台安装
 
@@ -8,7 +8,7 @@
 2. 粘贴以下地址并点击 **安装**：
 
    ```text
-   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.2/dsh-dmxapi-0.2.2.tgz
+   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.3/dsh-dmxapi-0.2.3.tgz
    ```
 
 3. 安装成功后点击 **立即启用**；如果界面要求重启，按提示完成。
@@ -18,9 +18,9 @@
 
 ## Windows ZIP 与安装脚本
 
-下载 [dsh-dmxapi-0.2.2-windows.zip](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.2/dsh-dmxapi-0.2.2-windows.zip)，完整解压，保留 `install.ps1` 与 `artifacts/` 的相对位置。不要在 ZIP 预览窗口中直接运行。
+下载 [dsh-dmxapi-0.2.3-windows.zip](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.3/dsh-dmxapi-0.2.3-windows.zip)，完整解压，保留 `install.ps1` 与 `artifacts/` 的相对位置。不要在 ZIP 预览窗口中直接运行。
 
-**桌面端：** 先启动一次官方 DeepSeek Harness Desktop `0.2.0-rc.2`，再从应用菜单或系统托盘选择 **退出**。仅关闭窗口可能仍在后台运行。在解压目录打开 PowerShell：
+**桌面端：** 先启动一次官方 DeepSeek Harness Desktop（当前已验证 `0.2.1-rc.3`），再从应用菜单或系统托盘选择 **退出**。仅关闭窗口可能仍在后台运行。在解压目录打开 PowerShell：
 
 ```powershell
 .\install.ps1
@@ -38,7 +38,7 @@
 
 ```powershell
 .\install.ps1 -Profile web
-npx --yes @deepseek-ai/dsh@0.2.1-rc.2 web
+npx --yes @deepseek-ai/dsh@next web
 ```
 
 Web 安装会从 npm 获取指定版本的 Harness。两个模式都遵循当前终端的 `DSH_HOME`；未设置时使用用户目录下的 `.dsh`。安装和启动必须使用相同的 `DSH_HOME`。脚本将压缩包保留在对应 profile 的 `local-packages/`，用于后续重装，并避免中文或空格路径在多层命令转发中被拆开。

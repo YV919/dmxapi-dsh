@@ -39,18 +39,18 @@
 
 ## 快速开始
 
-**插件 `0.2.2` 适用于 DeepSeek Harness Desktop / Web `0.2.1-rc.2`，并保留对 `0.2.0-rc.2`、`0.2.1-alpha.1` 和 `0.2.1-alpha.2` 的兼容声明。** 使用旧 Harness Web `0.1.5-rc.2` 的用户请保留插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
+**插件 `0.2.3` 使用统一的 DSH 兼容范围 `>=0.2.0-rc.2 <0.3.0-0`，已用当前桌面端 `0.2.1-rc.3` 验证，并覆盖同一 `0.2.x` 兼容线的预发布版本。** 使用旧 Harness Web `0.1.5-rc.2` 的用户请保留插件 [v0.1.9](https://github.com/YV919/dmxapi-dsh/releases/tag/v0.1.9)。
 
 1. 在 Harness 工作台左侧打开 **插件 → 添加插件**，粘贴下面的预构建安装包地址：
 
    ```text
-   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.2/dsh-dmxapi-0.2.2.tgz
+   https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.3/dsh-dmxapi-0.2.3.tgz
    ```
 
 2. 点击 **安装**，完成后选择 **立即启用**。如果 Harness 提示需要重启，请按提示重启。
 3. 打开 **插件 → DMXAPI-DSH配置工具**，选择接口预设。首次创建服务商时填写自己的 DMXAPI API Key 并点击 **新增配置**；已有同 ID、同协议服务商时，直接增改模型并点击 **保存模型修改**。回到聊天，从原生模型菜单选择模型。
 
-Windows 用户也可下载 [v0.2.2 安装 ZIP](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.2/dsh-dmxapi-0.2.2-windows.zip)，完整解压，先启动过桌面端并从系统托盘完全退出，再运行 `./install.ps1`。脚本默认安装到 `desktop` profile，只使用已安装桌面端自带的运行时，不需要另外安装 Node.js，也不会修改 PATH。找不到安装目录时可指定 `-DesktopPath "C:\你的安装目录\DeepSeek Harness"`。Web 用户明确运行 `./install.ps1 -Profile web`，需要 Node.js `^22.19.0` 或 `>=24.0.0`。详细步骤和升级方式见 [QUICKSTART.md](QUICKSTART.md)。
+Windows 用户也可下载 [v0.2.3 安装 ZIP](https://github.com/YV919/dmxapi-dsh/releases/download/v0.2.3/dsh-dmxapi-0.2.3-windows.zip)，完整解压，先启动过桌面端并从系统托盘完全退出，再运行 `./install.ps1`。脚本默认安装到 `desktop` profile，只使用已安装桌面端自带的运行时，不需要另外安装 Node.js，也不会修改 PATH。找不到安装目录时可指定 `-DesktopPath "C:\你的安装目录\DeepSeek Harness"`。Web 用户明确运行 `./install.ps1 -Profile web`，需要 Node.js `^22.19.0` 或 `>=24.0.0`。详细步骤和升级方式见 [QUICKSTART.md](QUICKSTART.md)。
 
 GitHub Release 提供公开安装包；社区插件市场的收录状态以[投稿 PR](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pulls?q=dmxapi-dsh)和市场目录为准。
 
@@ -155,7 +155,7 @@ npm run pack:plugin
 在工作台左侧 **插件** 中打开本插件，使用 Harness 提供的卸载操作；需要重启时按界面提示操作。Web 命令行用户也可执行：
 
 ```powershell
-npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile web remove dsh-dmxapi
+npx --yes @deepseek-ai/dsh@next plugin --profile web remove dsh-dmxapi
 ```
 
 已保存的模型配置与凭据仍由 Harness 管理，可在原生模型页手工删除。卸载也会移除插件提供的默认思考等级、MiMo 显示标签和 DeepSeek Anthropic 专用适配；继续使用模型前，请在聊天中显式选择该模型支持的原生等级，尤其不要让 GLM 等始终思考模型回退为关闭状态。MiMo 将恢复显示 Harness 内部的 `off / high`；使用 DeepSeek Anthropic 专用适配的配置需先切换到其他受支持的协议。
@@ -164,7 +164,7 @@ npx --yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile web remove dsh-dmxapi
 
 自动化测试使用本地模拟 HTTP/SSE 服务以及真实发布版 Harness runtime，验证配置到实际请求参数的链路，不会向 DMXAPI 发送付费请求。
 
-`0.2.2` 已通过既有 Harness `0.2.0-rc.2`、`0.2.1-alpha.1` 与 `0.2.1-alpha.2` SDK / runtime 的 116 项自动化测试；针对当前 `0.2.1-rc.2`，另以真实桌面端内置 CLI 在隔离 profile 安装预构建 `.tgz`，确认 `engines.dsh` 与 peer 兼容检查通过。测试覆盖新版工作台插件入口、桌面安装边界、三种协议、思考参数、图片与凭据隔离，以及已有服务商的模型增改、保存并发和重启持久化。本地模拟测试不代表 DMXAPI 的全部模型或其他供应商模型均已通过真实接口验收。
+`0.2.3` 使用统一范围 `>=0.2.0-rc.2 <0.3.0-0`，兼容矩阵覆盖 `0.2.0-rc.2`、`0.2.1-alpha.1`、`0.2.1-alpha.2`、`0.2.1-rc.2`、当前 `0.2.1-rc.3`，并拒绝 `0.3.0` 兼容线；在当前桌面端内置 CLI 的隔离 profile 中完成首次、重复和升级安装，确认 peer 兼容检查通过。测试覆盖新版工作台插件入口、桌面安装边界、三种协议、思考参数、图片与凭据隔离，以及已有服务商的模型增改、保存并发和重启持久化。本地模拟测试不代表 DMXAPI 的全部模型或其他供应商模型均已通过真实接口验收。
 
 2026-10-08 在 Windows 的 Harness Desktop `0.2.0-rc.2` 完成实际安装与界面验收：插件列表正确显示名称、图标和版本，配置页正常打开，插件已启用；安装前后核对的 4 个原有模型配置与凭据文件内容一致。`0.2.1-alpha.1` 与 `0.2.1-alpha.2` 的验证范围为隔离环境中的 SDK / runtime 测试，未宣称完成该预览版桌面界面验收。
 
@@ -172,7 +172,7 @@ API Key 输入界面的验收使用隔离 profile 和虚构凭据，检查默认
 
 2026-09-18 在开发者本机另行完成真实 DMXAPI 验收：`deepseek-v4.1-flash` 成功识别测试图片；`off / low / high / max` 四档均返回成功，关闭档无思考内容，其他三档返回思考内容。在 DeepSeek Harness Web 中已确认配置卡、图片附件入口和四档选择菜单可用。接口能力仍以接收者自己的账号及服务商后续更新为准；安装包不包含 API Key。
 
-依赖接口依据：[Harness 工作台插件管理](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/packages/client/ui-plugin-manager/README.zh.md)、[桌面运行时与插件安装](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/apps/desktop/README.zh.md)，以实际 `0.2.1-rc.2` 发布包为准。
+依赖接口依据：[Harness 工作台插件管理](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/packages/client/ui-plugin-manager/README.zh.md)、[桌面运行时与插件安装](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-rc.2/apps/desktop/README.zh.md)；兼容性以 package manifest 的统一范围和当前 `0.2.1-rc.3` 真实安装结果为准。
 
 ## 项目与支持
 

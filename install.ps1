@@ -4,7 +4,7 @@ param(
     [string]$DesktopPath
 )
 $ErrorActionPreference = 'Stop'
-$dmxVersion = '0.2.2'
+$dmxVersion = '0.2.3'
 $dmxPackageName = "dsh-dmxapi-$dmxVersion.tgz"
 $dmxPackage = Join-Path $PSScriptRoot "artifacts\$dmxPackageName"
 if (-not (Test-Path -LiteralPath $dmxPackage -PathType Leaf)) {
@@ -37,7 +37,7 @@ function Find-DmxDesktopCommand {
             return $dmxCommand
         }
     }
-    throw '找不到 DeepSeek Harness 桌面端内置命令。请先安装官方桌面端 0.2.1-rc.2，或用 -DesktopPath 指定含 DeepSeek Harness.exe 的安装目录。不会回退到 npm CLI。'
+    throw '找不到 DeepSeek Harness 桌面端内置命令。请先安装与插件兼容范围相符的官方桌面端，或用 -DesktopPath 指定含 DeepSeek Harness.exe 的安装目录。不会回退到 npm CLI。'
 }
 
 $dmxHarnessHome = if ($env:DSH_HOME) { $env:DSH_HOME } else { Join-Path ([Environment]::GetFolderPath('UserProfile')) '.dsh' }
@@ -77,7 +77,7 @@ $dmxPackageSpec = "file:local-packages/$dmxPackageName"
 if ($Profile -eq 'desktop') {
     & $dmxDesktopCommand plugin --profile desktop add $dmxPackageSpec
 } else {
-    & npx.cmd --yes '@deepseek-ai/dsh@0.2.1-rc.2' plugin --profile web add $dmxPackageSpec
+    & npx.cmd --yes '@deepseek-ai/dsh@next' plugin --profile web add $dmxPackageSpec
 }
 if ($LASTEXITCODE -ne 0) { throw "插件安装失败，退出码：$LASTEXITCODE" }
 Write-Host '安装成功。请重新打开对应的 Harness，在左侧 插件 → DMXAPI-DSH配置工具 中配置模型。'

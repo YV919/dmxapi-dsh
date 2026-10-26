@@ -1,6 +1,6 @@
 {
   "name": "dsh-dmxapi",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "DMXAPI-DSH配置工具：在 DeepSeek Harness 桌面和 Web 工作台配置模型、密钥，并编辑已有服务商的模型。",
   "type": "module",
   "license": "MIT",
@@ -14,7 +14,7 @@
   },
   "engines": {
     "node": ">=22",
-    "dsh": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2 || 0.2.1-rc.2"
+    "dsh": ">=0.2.0-rc.2 <0.3.0-0"
   },
   "main": "lib/index.js",
   "exports": {
@@ -62,31 +62,33 @@
     "@deepseek-ai/cordis": "4.0.4",
     "@deepseek-ai/dsh-api-remotes": "0.2.0-rc.2",
     "@deepseek-ai/dsh-api-settings-controller": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-app-boot": "0.2.0-rc.2",
     "@deepseek-ai/dsh-attachment": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-renderer": "0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-settings": "0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-slots": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-config-editor": "0.2.0-rc.2",
     "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
     "@deepseek-ai/dsh-llm-pi-ai": "0.2.0-rc.2",
     "@deepseek-ai/dsh-settings": "0.2.0-rc.2",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.0.0",
     "@types/react": "^18.3.1",
+    "@types/semver": "^7.8.0",
     "esbuild": "^0.25.0",
     "js-yaml": "^4.1.0",
     "react": "^18.3.1",
+    "semver": "^7.8.5",
     "tsx": "^4.20.0",
-    "typescript": "~5.7.3",
-    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-app-boot": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-config-editor": "0.2.0-rc.2"
+    "typescript": "~5.7.3"
   },
   "icon": "./src/client/assets/dmxapi-icon.png",
   "peerDependencies": {
-    "@deepseek-ai/dsh-llm": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2 || 0.2.1-rc.2",
-    "@deepseek-ai/dsh-llm-pi-ai": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2 || 0.2.1-rc.2",
-    "@deepseek-ai/dsh-settings": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2 || 0.2.1-rc.2",
-    "@deepseek-ai/dsh-client-ui-settings": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2 || 0.2.1-rc.2",
-    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2 || 0.2.1-alpha.1 || 0.2.1-alpha.2 || 0.2.1-rc.2"
+    "@deepseek-ai/dsh-client-ui-plugin-manager": ">=0.2.0-rc.2 <0.3.0-0",
+    "@deepseek-ai/dsh-client-ui-settings": ">=0.2.0-rc.2 <0.3.0-0",
+    "@deepseek-ai/dsh-llm": ">=0.2.0-rc.2 <0.3.0-0",
+    "@deepseek-ai/dsh-llm-pi-ai": ">=0.2.0-rc.2 <0.3.0-0",
+    "@deepseek-ai/dsh-settings": ">=0.2.0-rc.2 <0.3.0-0"
   }
 }

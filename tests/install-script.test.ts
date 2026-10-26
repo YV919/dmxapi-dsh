@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import test from 'node:test'
 
 const windows = process.platform === 'win32'
-const packageName = 'dsh-dmxapi-0.2.2.tgz'
+const packageName = 'dsh-dmxapi-0.2.3.tgz'
 const quote = (value: string) => `'${value.replaceAll("'", "''")}'`
 
 function fixture() {
@@ -44,7 +44,7 @@ function Get-Process {
 }
 function Get-ItemProperty {
   param($Path, $ErrorAction)
-  [pscustomobject]@{DisplayName='DeepSeek Harness 0.2.1-rc.2';InstallLocation=$env:DMX_INSTALL_TEST_DESKTOP}
+  [pscustomobject]@{DisplayName='DeepSeek Harness';InstallLocation=$env:DMX_INSTALL_TEST_DESKTOP}
 }
 try { & ${quote(join(source, 'install.ps1'))} ${options.args ?? `-DesktopPath ${quote(desktop)}`}; exit 0 } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
 `
@@ -120,12 +120,12 @@ test('desktop installer reports native command failure', { skip: !windows }, () 
   } finally { f.cleanup() }
 })
 
-test('only explicit web mode invokes the pinned npm Harness CLI', { skip: !windows }, () => {
+test('only explicit web mode invokes the npm Harness next CLI', { skip: !windows }, () => {
   const f = fixture()
   try {
     const result = f.run({ args: '-Profile web' })
     assert.equal(result.status, 0, result.stderr)
-    assert.equal(readFileSync(f.npmOutput, 'utf8').trim(), `--yes @deepseek-ai/dsh@0.2.1-rc.2 plugin --profile web add file:local-packages/${packageName}`)
+    assert.equal(readFileSync(f.npmOutput, 'utf8').trim(), `--yes @deepseek-ai/dsh@next plugin --profile web add file:local-packages/${packageName}`)
     assert.equal(existsSync(f.profile), false)
     assert.equal(existsSync(join(f.home, 'profiles', 'web', 'local-packages', packageName)), true)
     assert.equal(existsSync(f.output), false)
